@@ -50,7 +50,7 @@
 </section>
 
 <!-- LIST -->
-<div class="container mb-5">
+<div class="container mb-5 justify-content-center d-flex flex-column align-items-center">
 
     <div class="card-custom d-flex align-items-center mb-4">
         <img src="{{ asset('Asset/Pic/WhatsApp Image 2026-04-25 at 12.03.01.jpeg') }}" width="100">
@@ -58,7 +58,7 @@
             <h5>Pakan Sehat</h5>
             <p>Lorem ipsum dolor sit amet...</p>
         </div>
-        <a href="#">Detail →</a>
+        <a href="CampaignFeed-Detail">Detail →</a>
     </div>
 
     <div class="card-custom d-flex align-items-center mb-4">
@@ -67,7 +67,7 @@
             <h5>Hamil Sehat</h5>
             <p>Lorem ipsum dolor sit amet...</p>
         </div>
-        <a href="#">Detail →</a>
+        <a href="CampaignFeed-Detail">Detail →</a>
     </div>
 
     <div class="card-custom d-flex align-items-center">
@@ -76,7 +76,7 @@
             <h5>Vitamin Bulanan</h5>
             <p>Lorem ipsum dolor sit amet...</p>
         </div>
-        <a href="#">Detail →</a>
+        <a href="CampaignFeed-Detail">Detail →</a>
     </div>
 
 </div>

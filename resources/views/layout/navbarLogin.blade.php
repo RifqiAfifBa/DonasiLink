@@ -13,20 +13,20 @@
 
 <body>
     <!-- NAVBAR LOGIN-->
-    <div class="container py-3">
+    <div class="container py-3 navbar-login">
         <div class="d-flex justify-content-between align-items-center">
             <h5>$ DonasiLink</h5>
             <div>
                 <a href="#" class="me-3">Register</a>
                 |
-                <a href="#" class="login-btn ms-3">Log In</a>
+                <a href="#" class="login-btn ms-3" style="background-color: #CCB3D1!important;color:white;">Log In</a>
             </div>
         </div>
     </div>
     @yield('content')
     @include('layout.footer')
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src=" https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
 </html>

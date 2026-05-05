@@ -1,139 +1,7 @@
 @extends('layout.navbarUser')
 @section('content')
 <style>
-    .content-wrapper {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        padding: 20px;
-        margin: 20px auto;
-        width: 100%;
-        box-sizing: border-box;
-        overflow-x: hidden;
-    }
 
-    .checkout-container {
-        width: 100%;
-        max-width: 700px;
-        padding: 30px;
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        box-sizing: border-box;
-    }
-
-    .checkout-header h2 {
-        font-size: 28px;
-        color: #2b1b2f;
-        margin-bottom: 20px;
-        font-family: 'Instrument Serif-Regular', serif;
-    }
-
-    .form-group {
-        margin-bottom: 20px;
-    }
-
-    .form-group label {
-        display: block;
-        margin-bottom: 8px;
-        color: #2b1b2f;
-        font-weight: 500;
-    }
-
-    .form-group input,
-    .form-group select {
-        width: 100%;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 14px;
-        box-sizing: border-box;
-    }
-
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-    }
-
-    .amount-options {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-    }
-
-    .amount-btn {
-        flex: 1;
-        padding: 12px;
-        border: 2px solid #CCB3D1;
-        background-color: transparent;
-        color: #2b1b2f;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 14px;
-        transition: all 0.3s;
-    }
-
-    .amount-btn:hover,
-    .amount-btn.active {
-        background-color: #CCB3D1;
-        color: #fff;
-    }
-
-    .btn-submit {
-        width: 100%;
-        padding: 14px;
-        background-color: #CCB3D1;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        margin-top: 20px;
-    }
-
-    .btn-submit:hover {
-        background-color: #b89bc4;
-    }
-
-    .payment-info {
-        background-color: #f0f0f0;
-        padding: 15px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-    }
-
-    .payment-info-row {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 8px;
-    }
-
-    .payment-info-row.total {
-        font-weight: 600;
-        border-top: 1px solid #ddd;
-        padding-top: 8px;
-        margin-top: 8px;
-    }
-
-    @media (max-width: 768px) {
-        .content-wrapper {
-            padding: 15px;
-        }
-
-        .checkout-container {
-            padding: 20px;
-        }
-
-        .form-row {
-            grid-template-columns: 1fr;
-        }
-
-        .amount-options {
-            flex-wrap: wrap;
-        }
-    }
 </style>
 
 <div class="content-wrapper">
@@ -146,13 +14,17 @@
             <div class="form-group">
                 <label>Pilih Jumlah Donasi</label>
                 <div class="amount-options">
-                    <button type="button" class="amount-btn active" data-amount="50000">Rp 50rb</button>
+                    <button type="button" class="amount-btn" data-amount="50000">Rp 50rb</button>
                     <button type="button" class="amount-btn" data-amount="100000">Rp 100rb</button>
                     <button type="button" class="amount-btn" data-amount="250000">Rp 250rb</button>
                     <button type="button" class="amount-btn" data-amount="500000">Rp 500rb</button>
                 </div>
             </div>
-
+            <div class="paymentSelf justify-content-center d-flex gap-5">
+                <div class="selfInfo p-2 amount-btn" data-amount="custom">
+                    <input type="text" placeholder="Silahkan Isi Nominal" class="form-control text-center" id="customAmount">
+                </div>
+            </div>
             <div class="payment-info">
                 <div class="payment-info-row">
                     <span>Kampanye:</span>
@@ -208,6 +80,7 @@
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.custom-amount').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
             const amount = parseInt(this.dataset.amount);
             const formatted = new Intl.NumberFormat('id-ID', {
