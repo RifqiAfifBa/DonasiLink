@@ -1,8 +1,5 @@
 @extends('layout.navbarUser')
 @section('content')
-<style>
-
-</style>
 
 <div class="content-wrapper">
     <div class="checkout-container">
@@ -75,19 +72,22 @@
     </div>
 </div>
 
+<link rel="stylesheet" href="{{ asset('css/style.css') }}">
+
 <script>
     document.querySelectorAll('.amount-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             document.querySelectorAll('.amount-btn').forEach(b => b.classList.remove('active'));
-            document.querySelectorAll('.custom-amount').forEach(b => b.classList.remove('active'));
             this.classList.add('active');
-            const amount = parseInt(this.dataset.amount);
+
+            const amount = parseInt(this.dataset.amount, 10);
             const formatted = new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR',
                 minimumFractionDigits: 0
             }).format(amount);
+
             document.getElementById('displayAmount').textContent = formatted;
             document.getElementById('totalAmount').textContent = formatted;
         });
@@ -98,5 +98,6 @@
         alert('Terima kasih! Donasi Anda sedang diproses.');
     });
 </script>
+
 
 @endsection
