@@ -16,7 +16,7 @@
 
     <!-- Form Container -->
     <div class="shelter-form-wrapper">
-        <form action="#" method="POST" enctype="multipart/form-data" class="shelter-form">
+        <form action="{{ route('shelter.storeStruk') }}" method="POST" enctype="multipart/form-data" class="shelter-form">
             @csrf
 
             <!-- Title -->

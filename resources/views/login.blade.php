@@ -10,12 +10,18 @@
             <p>Silakan masuk dengan akun Anda untuk melanjutkan</p>
         </div>
 
-        <form id="loginForm" class="login-form">
+        @if($errors->any())
+            <div class="alert alert-danger">
+                {{ $errors->first() }}
+            </div>
+        @endif
+
+        <form action="{{ route('login.post') }}" method="POST" class="login-form">
             @csrf
 
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" required placeholder="Masukkan email Anda" class="form-input">
+                <input type="email" id="email" name="email" required placeholder="Masukkan email Anda" class="form-input" value="{{ old('email') }}">
             </div>
 
             <div class="form-group">
@@ -33,16 +39,8 @@
 
         <div class="login-footer">
             <p>Belum punya akun? <a href="#" class="link-signup">Daftar di sini</a></p>
-            <p><a href="#" class="link-forgot">Lupa password?</a></p>
         </div>
     </div>
 </div>
-
-<script>
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Proses login sedang berlangsung...');
-    });
-</script>
 
 @endsection

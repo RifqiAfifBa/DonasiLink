@@ -7,15 +7,22 @@
         <div class="shelter-header-content">
             <span class="shelter-logo">$ DonasiLink</span>
             <div class="shelter-nav">
-                <a href="#" class="shelter-nav-link">Dashboard</a>
-                <a href="#" class="shelter-nav-link">Withdrawal Tracking</a>
+                <a href="{{ route('shelter.landingpage') }}" class="shelter-nav-link">Dashboard</a>
+                <a href="{{ route('shelter.withdraw') }}" class="shelter-nav-link">Withdrawal Tracking</a>
             </div>
         </div>
     </div>
 
     <!-- Form Container -->
     <div class="shelter-form-wrapper">
-        <form action="#" method="POST" enctype="multipart/form-data" class="shelter-form">
+
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
+            </div>
+        @endif
+
+        <form action="{{ route('shelter.storeKampanye') }}" method="POST" enctype="multipart/form-data" class="shelter-form">
             @csrf
 
             <!-- Image Upload Section -->
@@ -34,40 +41,34 @@
             <!-- Form Fields -->
             <div class="shelter-form-fields">
                 <div class="shelter-form-group">
-                    <input type="text" name="nama_hewan" placeholder="Nama Hewan" class="shelter-input" required>
+                    <input type="text" name="nama_hewan" placeholder="Nama Hewan" class="shelter-input" value="{{ old('nama_hewan') }}" required>
                 </div>
 
                 <div class="shelter-form-group">
-                    <input type="text" name="usia_hewan" placeholder="Usia Hewan" class="shelter-input" required>
+                    <input type="text" name="usia_hewan" placeholder="Usia Hewan" class="shelter-input" value="{{ old('usia_hewan') }}" required>
                 </div>
 
                 <div class="shelter-form-group">
                     <select name="sedang_sakit" class="shelter-input" required>
                         <option value="">Sedang Sakit (Ya / Tidak)</option>
-                        <option value="ya">Ya</option>
-                        <option value="tidak">Tidak</option>
+                        <option value="ya" {{ old('sedang_sakit') == 'ya' ? 'selected' : '' }}>Ya</option>
+                        <option value="tidak" {{ old('sedang_sakit') == 'tidak' ? 'selected' : '' }}>Tidak</option>
                     </select>
                 </div>
 
                 <div class="shelter-form-group">
-                    <input type="text" name="kebutuhan_hewan" placeholder="Kebutuhan Hewan" class="shelter-input" required>
+                    <input type="text" name="kebutuhan_hewan" placeholder="Kebutuhan Hewan" class="shelter-input" value="{{ old('kebutuhan_hewan') }}" required>
                 </div>
 
                 <div class="shelter-form-group">
-                    <textarea name="deskripsi_hewan" placeholder="Deskripsi Hewan" rows="6" class="shelter-input" required></textarea>
+                    <textarea name="deskripsi_hewan" placeholder="Deskripsi Hewan" rows="6" class="shelter-input" required>{{ old('deskripsi_hewan') }}</textarea>
                 </div>
-            </div>
-
-            <!-- Saldo Section -->
-            <div class="shelter-saldo-section">
-                <button type="button" class="shelter-saldo-btn">Saldo Minimal</button>
-                <button type="button" class="shelter-saldo-btn">Saldo Maksimal</button>
             </div>
 
             <!-- Action Buttons -->
             <div class="shelter-form-actions">
                 <button type="submit" class="shelter-btn-primary">UPLOAD</button>
-                <a href="#" class="shelter-btn-secondary">KEMBALI</a>
+                <a href="{{ route('shelter.landingpage') }}" class="shelter-btn-secondary">KEMBALI</a>
             </div>
         </form>
     </div>

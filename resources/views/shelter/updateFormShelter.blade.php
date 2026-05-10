@@ -17,7 +17,8 @@
 
     <!-- Form Container -->
     <div class="container mx-auto px-4 py-8 max-w-2xl">
-        <form action="#" method="POST" enctype="multipart/form-data" class="bg-white rounded-lg shadow-md p-8">
+        <form action="{{ route('shelter.updateKampanye', $kampanye->id) }}" method="POST" enctype="multipart/form-data" class="bg-white rounded-lg shadow-md p-8">
+            @method('PUT')
             @csrf
 
             <!-- Image Upload Section -->
@@ -90,7 +91,7 @@
                 <button type="submit" class="w-full px-6 py-3 bg-purple-300 text-white rounded-lg hover:bg-purple-400 transition font-semibold text-lg">
                     UPLOAD
                 </button>
-                <a href="#" class="block w-full px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold text-lg text-center">
+                <a href="{{ route('shelter.landingpage') }}" class="block w-full px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition font-semibold text-lg text-center">
                     KEMBALI
                 </a>
             </div>
