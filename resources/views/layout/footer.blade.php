@@ -5,11 +5,13 @@
     }
 
     .footer-bg {
-        background-color: #CCB3D1;
+        background-color: var(--navbar-bg);
+        color: var(--text-primary);
         width: 100%;
         margin: 0;
         display: block;
         overflow-x: hidden;
+        border-top: 1px solid var(--border-color);
     }
 
     .footer-content {
@@ -17,13 +19,14 @@
         font-family: AppleGaramond;
     }
 
-    .footer-content h5 {
+    .footer-content h4, .footer-content h5 {
         margin-bottom: 15px;
-        color: black;
+        color: var(--text-primary);
     }
 
     .footer-content p {
         margin-bottom: 0;
+        color: var(--text-primary);
         font-family: AppleGaramond;
     }
 

@@ -29,6 +29,7 @@ class ShelterController extends Controller
             'sedang_sakit'    => 'required|in:ya,tidak',
             'kebutuhan_hewan' => 'required|string|max:200',
             'deskripsi_hewan' => 'required|string',
+            'target_donasi'   => 'required|numeric|min:10000',
             'image'           => 'nullable|image|max:2048',
         ]);
 
@@ -44,10 +45,11 @@ class ShelterController extends Controller
             'sedang_sakit'    => $validated['sedang_sakit'],
             'kebutuhan_hewan' => $validated['kebutuhan_hewan'],
             'deskripsi_hewan' => $validated['deskripsi_hewan'],
+            'target_donasi'   => $validated['target_donasi'],
             'gambar'          => $gambar,
         ]);
 
-        return redirect()->route('shelter.landingpage')->with('success', 'Kampanye berhasil ditambahkan!');
+        return redirect()->route('shelter.landingpage')->with('success', 'Kampanye berhasil dipublikasikan!');
     }
 
     public function widthdrawShelter()
@@ -73,6 +75,7 @@ class ShelterController extends Controller
             'sedang_sakit'    => 'required|in:ya,tidak',
             'kebutuhan_hewan' => 'required|string|max:200',
             'deskripsi_hewan' => 'required|string',
+            'target_donasi'   => 'required|numeric|min:10000',
             'image'           => 'nullable|image|max:2048',
         ]);
 
@@ -82,6 +85,7 @@ class ShelterController extends Controller
             'sedang_sakit'    => $validated['sedang_sakit'],
             'kebutuhan_hewan' => $validated['kebutuhan_hewan'],
             'deskripsi_hewan' => $validated['deskripsi_hewan'],
+            'target_donasi'   => $validated['target_donasi'],
         ];
 
         if ($request->hasFile('image')) {

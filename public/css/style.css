@@ -1,3 +1,29 @@
+:root {
+    --bg-primary: #f5f5f5;
+    --bg-secondary: #ffffff;
+    --text-primary: #2b1b2f;
+    --text-secondary: #666666;
+    --accent-primary: #ccb3d1;
+    --accent-secondary: #7c3f8e;
+    --navbar-bg: #ccb3d1;
+    --card-bg: rgba(255, 255, 255, 0.95);
+    --border-color: rgba(204, 179, 209, 0.45);
+    --shadow: rgba(0, 0, 0, 0.06);
+}
+
+.dark-mode {
+    --bg-primary: #120c14;
+    --bg-secondary: #1e1422;
+    --text-primary: #e0d0e6;
+    --text-secondary: #b8a0c5;
+    --accent-primary: #7c3f8e;
+    --accent-secondary: #ccb3d1;
+    --navbar-bg: #2b1b2f;
+    --card-bg: #1e1422;
+    --border-color: rgba(204, 179, 209, 0.2);
+    --shadow: rgba(0, 0, 0, 0.3);
+}
+
 /* Consolidated styling for DonasiLink */
 
 @font-face {
@@ -10,6 +36,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 html {
@@ -17,9 +44,9 @@ html {
 }
 
 body {
-    font-family: serif;
-    color: #2b1b2f;
-    background: #f5f5f5;
+    font-family: 'Inter', sans-serif;
+    color: var(--text-primary);
+    background: var(--bg-primary);
     line-height: 1.6;
 }
 
@@ -43,9 +70,10 @@ a {
 .content-wrapper .checkout-container {
     width: 100%;
     max-width: 720px;
-    background: rgba(255, 255, 255, 0.92);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px var(--shadow);
     padding: 28px;
     margin: 18px auto;
     backdrop-filter: blur(8px);
@@ -57,7 +85,7 @@ a {
 
 .checkout-header h2 {
     font-size: 28px;
-    color: #2b1b2f;
+    color: var(--text-primary);
     margin: 0;
 }
 
@@ -69,9 +97,9 @@ a {
 }
 
 .amount-btn {
-    border: 1px solid #ccb3d1;
-    background: #fff;
-    color: #2b1b2f;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     padding: 12px 10px;
     border-radius: 12px;
     cursor: pointer;
@@ -86,25 +114,26 @@ a {
 
 .amount-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 18px rgba(204, 179, 209, 0.35);
+    box-shadow: 0 8px 18px var(--shadow);
 }
 
 .amount-btn.active {
-    background: #ccb3d1;
-    border-color: #b89bc4;
-    color: #2b1b2f;
+    background: var(--accent-primary);
+    border-color: var(--accent-secondary);
+    color: #fff;
 }
 
 #customAmount {
-    border: 1px solid #ccb3d1;
-    background: #fff;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
     border-radius: 12px;
 }
 
 .payment-info {
     margin-top: 20px;
-    background: #f7f3f8;
-    border: 1px solid rgba(204, 179, 209, 0.45);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
     border-radius: 14px;
     padding: 16px;
     width: 100%;
@@ -116,11 +145,11 @@ a {
     gap: 12px;
     padding: 8px 2px;
     font-size: 15px;
-    color: #2b1b2f;
+    color: var(--text-primary);
 }
 
 .payment-info-row.total {
-    border-top: 1px dashed rgba(204, 179, 209, 0.7);
+    border-top: 1px dashed var(--border-color);
     margin-top: 6px;
     font-weight: 800;
 }
@@ -131,11 +160,11 @@ a {
     border: none;
     padding: 14px 18px;
     border-radius: 14px;
-    background: linear-gradient(135deg, #c9a6d4 0%, #d8b5e0 100%);
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
     color: #fff;
     font-weight: 800;
     cursor: pointer;
-    box-shadow: 0 10px 25px rgba(201, 166, 212, 0.25);
+    box-shadow: 0 10px 25px var(--shadow);
     transition:
         transform 0.15s ease,
         box-shadow 0.15s ease;
@@ -150,10 +179,11 @@ a {
 .detail-container {
     width: 100%;
     max-width: 980px;
-    background-color: #ccb3d1;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 18px;
     padding: 28px 24px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px var(--shadow);
 }
 
 .detail-header {
@@ -173,7 +203,7 @@ a {
 }
 
 .detail-title {
-    color: #2b1b2f;
+    color: var(--text-primary);
     font-size: 32px;
     margin: 0;
 }
@@ -195,7 +225,7 @@ a {
 
 .detail-content p {
     margin-bottom: 14px;
-    color: #2b1b2f;
+    color: var(--text-primary);
     line-height: 1.8;
 }
 
@@ -220,8 +250,9 @@ a {
 }
 
 .btn-secondary {
-    background: #f0f0f0;
-    color: #333;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 
 .btn-primary {
@@ -233,7 +264,7 @@ a {
 .page-title {
     text-align: center;
     font-size: 32px;
-    color: #2b1b2f;
+    color: var(--text-primary);
     margin-bottom: 40px;
     font-family: "IosevkaCharon-Regular", serif;
 }
@@ -244,8 +275,9 @@ a {
 }
 
 .story-card {
-    background-color: #f9f9f9;
+    background-color: var(--bg-secondary);
     padding: 30px;
+    border: 1px solid var(--border-color);
     border-radius: 8px;
     margin-bottom: 30px;
     box-sizing: border-box;
@@ -277,24 +309,25 @@ a {
 
 .story-title {
     font-size: 22px;
-    color: #2b1b2f;
+    color: var(--text-primary);
     margin-bottom: 8px;
     font-family: "IosevkaCharon-Regular", serif;
 }
 
 .story-author {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 14px;
     margin-bottom: 5px;
 }
 
 .story-date {
-    color: #999;
+    color: var(--text-secondary);
+    opacity: 0.7;
     font-size: 13px;
 }
 
 .story-content {
-    color: #333;
+    color: var(--text-secondary);
     line-height: 1.8;
     margin-bottom: 20px;
 }
@@ -304,18 +337,18 @@ a {
     justify-content: space-between;
     align-items: center;
     padding-top: 20px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border-color);
 }
 
 .story-stats {
     display: flex;
     gap: 20px;
     font-size: 13px;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .story-link {
-    color: #ccb3d1;
+    color: var(--accent-secondary);
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s;
@@ -381,10 +414,10 @@ a {
 
 /* Card */
 .shelter-card {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(204, 179, 209, 0.45);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    box-shadow: 0 10px 30px var(--shadow);
     overflow: hidden;
     transition:
         transform 0.18s ease,
@@ -423,13 +456,13 @@ a {
 .shelter-card-title {
     font-size: 18px;
     margin: 0;
-    color: #2b1b2f;
+    color: var(--text-primary);
     font-weight: 800;
 }
 
 .shelter-card-description {
     margin: 0;
-    color: #4a4a4a;
+    color: var(--text-secondary);
     font-size: 14px;
     line-height: 1.7;
     display: -webkit-box;
@@ -468,9 +501,9 @@ a {
     height: 56px;
     border-radius: 50%;
     border: none;
-    background: linear-gradient(135deg, #c9a6d4 0%, #d8b5e0 100%);
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
     color: #fff;
-    box-shadow: 0 14px 35px rgba(201, 166, 212, 0.35);
+    box-shadow: 0 14px 35px var(--shadow);
     cursor: pointer;
     z-index: 999;
     display: inline-flex;
@@ -505,10 +538,10 @@ a {
 .modal-content {
     width: 100%;
     max-width: 720px;
-    background: rgba(255, 255, 255, 0.98);
-    border: 1px solid rgba(204, 179, 209, 0.55);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 18px;
-    box-shadow: 0 22px 70px rgba(0, 0, 0, 0.18);
+    box-shadow: 0 22px 70px var(--shadow);
     overflow: hidden;
 }
 
@@ -517,14 +550,15 @@ a {
     align-items: center;
     justify-content: space-between;
     padding: 16px 18px;
-    background: linear-gradient(135deg, #ccb3d1 0%, #e7d6ef 100%);
+    background: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .modal-title {
     margin: 0;
     font-size: 18px;
     font-weight: 900;
-    color: #2b1b2f;
+    color: var(--text-primary);
 }
 
 .close-btn {
@@ -532,8 +566,8 @@ a {
     height: 36px;
     border-radius: 10px;
     border: none;
-    background: rgba(255, 255, 255, 0.65);
-    color: #2b1b2f;
+    background: var(--bg-primary);
+    color: var(--text-primary);
     font-size: 22px;
     line-height: 34px;
     cursor: pointer;
@@ -563,7 +597,7 @@ a {
     display: block;
     margin-bottom: 8px;
     font-weight: 800;
-    color: #4a4a4a;
+    color: var(--text-primary);
 }
 
 .modal input[type="text"],
@@ -656,6 +690,21 @@ a {
 .login-header {
     margin-bottom: 32px;
     text-align: center;
+}
+
+.btn-back-home {
+    display: inline-block;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: #7c3f8e;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.btn-back-home:hover {
+    color: #4a1060;
+    text-decoration: underline;
 }
 
 .login-header h1 {
@@ -1250,9 +1299,10 @@ a {
 }
 
 .shelter-modal-content {
-    background: #fff;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 20px 60px var(--shadow);
     max-width: 500px;
     width: 90%;
     max-height: 85vh;
@@ -1265,14 +1315,14 @@ a {
     justify-content: space-between;
     align-items: center;
     padding: 24px;
-    border-bottom: 1px solid #eee;
-    background: linear-gradient(135deg, #f5f3f8 0%, #fff 100%);
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-primary);
 }
 
 .shelter-modal-header h2 {
     margin: 0;
     font-size: 22px;
-    color: #2b1b2f;
+    color: var(--text-primary);
     font-weight: 700;
 }
 
@@ -1291,7 +1341,7 @@ a {
 }
 
 .shelter-modal-close:hover {
-    color: #2b1b2f;
+    color: var(--accent-secondary);
 }
 
 .shelter-modal-body {
@@ -1322,7 +1372,7 @@ a {
     display: block !important;
     font-size: 13px;
     font-weight: 600;
-    color: #2b1b2f;
+    color: var(--text-primary);
     margin-bottom: 6px;
 }
 
@@ -1334,9 +1384,9 @@ a {
 
 .shelter-btn-cancel {
     padding: 12px 20px;
-    background-color: #f0f0f0;
-    color: #333;
-    border: 1px solid #ddd;
+    background-color: var(--bg-primary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
     border-radius: 10px;
     font-size: 14px;
     font-weight: 600;
@@ -1345,8 +1395,7 @@ a {
 }
 
 .shelter-btn-cancel:hover {
-    background-color: #e5e5e5;
-    border-color: #999;
+    opacity: 0.8;
 }
 
 @keyframes fadeIn {

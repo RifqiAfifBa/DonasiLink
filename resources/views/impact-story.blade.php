@@ -25,7 +25,7 @@
                 </p>
                 <p>
                     "Saya sangat bersyukur. Sebelumnya, ternak saya sering sakit karena pakan yang kurang berkualitas. Sekarang,
-                    dengan pakan dari program ini, produktivitas meningkat 40% dan ternak jauh lebih sehat. Penghasilan saya
+                    with pakan dari program ini, produktivitas meningkat 40% dan ternak jauh lebih sehat. Penghasilan saya
                     naik signifikan," ungkap Ibu Siti dengan senyuman.
                 </p>
                 <p>
