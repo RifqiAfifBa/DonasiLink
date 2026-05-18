@@ -7,6 +7,7 @@ use App\Models\Shelter;
 use App\Models\Donatur;
 use App\Models\Kampanye;
 use App\Models\Donasi;
+use App\Models\Penarikan;
 
 class AdminController extends Controller
 {
@@ -54,5 +55,34 @@ class AdminController extends Controller
         return view('admin.donasi', [
             'donasi' => Donasi::with('kampanye')->latest()->get(),
         ]);
+    }
+
+    public function penarikan()
+    {
+        if (!$this->checkAdmin()) return redirect()->route('login');
+
+        // Fetch penarikan sorted by the ones needing attention first (Diproses)
+        $riwayat = Penarikan::with('shelter')
+            ->orderByRaw("FIELD(status, 'Diproses', 'Berhasil', 'Gagal')")
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('admin.penarikan', compact('riwayat'));
+    }
+
+    public function acceptPenarikan(Penarikan $penarikan)
+    {
+        if (!$this->checkAdmin()) return redirect()->route('login');
+
+        $penarikan->update(['status' => 'Berhasil']);
+        return redirect()->back()->with('success', 'Penarikan berhasil disetujui.');
+    }
+
+    public function rejectPenarikan(Penarikan $penarikan)
+    {
+        if (!$this->checkAdmin()) return redirect()->route('login');
+
+        $penarikan->update(['status' => 'Gagal']);
+        return redirect()->back()->with('success', 'Penarikan telah ditolak.');
     }
 }

@@ -4,6 +4,12 @@
 
 <div class="shelter-page-wrapper">
 
+    @if(session('success'))
+    <div class="alert alert-success" style="margin: 20px auto; max-width: 1000px;">
+        {{ session('success') }}
+    </div>
+    @endif
+
 
     <!-- Withdrawal List -->
     <div class="shelter-list-wrapper">
@@ -37,50 +43,53 @@
         <div class="shelter-modal-content">
             <!-- Modal Header -->
             <div class="shelter-modal-header">
-                <h2>Upload Bukti Pengeluaran</h2>
+                <h2>Formulir Penarikan Dana</h2>
                 <button class="shelter-modal-close" id="closeModal">&times;</button>
             </div>
 
             <!-- Modal Body - Form -->
             <div class="shelter-modal-body">
-                <form id="uploadBuktiForm" class="shelter-form">
+                <form id="uploadBuktiForm" class="shelter-form" action="{{ route('shelter.storePenarikan') }}" method="POST">
                     @csrf
-
-                    <!-- Image Upload Section -->
-                    <div class="shelter-upload-section">
-                        <div class="shelter-upload-box" onclick="document.getElementById('buktiImage').click()">
-                            <input type="file" id="buktiImage" name="bukti_pengeluaran" class="shelter-file-input" accept="image/*">
-                            <div class="shelter-upload-content">
-                                <svg class="shelter-upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <span class="shelter-upload-text">Upload Bukti</span>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Form Fields -->
                     <div class="shelter-form-fields">
                         <div class="shelter-form-group">
-                            <label>Total Pengeluaran (Rp)</label>
-                            <input type="text" name="total_pengeluaran" placeholder="Contoh: 500000" class="shelter-input" required>
+                            <label>Bank Tujuan</label>
+                            <select name="bank" class="shelter-input" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color, #ccc); border-radius: 8px; background: var(--bg-secondary, #fff); color: var(--text-primary);">
+                                <option value="" disabled selected>Pilih Bank</option>
+                                <option value="BCA">BCA</option>
+                                <option value="Mandiri">Mandiri</option>
+                                <option value="BNI">BNI</option>
+                                <option value="BRI">BRI</option>
+                            </select>
                         </div>
 
                         <div class="shelter-form-group">
-                            <label>Tanggal (DD/MM/YYYY)</label>
-                            <input type="text" name="tanggal" placeholder="Contoh: 10/05/2026" class="shelter-input" required>
+                            <label>Nomor Rekening</label>
+                            <input type="text" name="nomor_rekening" placeholder="Contoh: 1234567890" class="shelter-input" required>
                         </div>
 
                         <div class="shelter-form-group">
-                            <label>Keterangan Pengeluaran</label>
-                            <textarea name="keterangan_pengeluaran" placeholder="Jelaskan detail pengeluaran..." rows="4" class="shelter-input" required></textarea>
+                            <label>Nama Pemilik Rekening</label>
+                            <input type="text" name="nama_rekening" placeholder="Contoh: John Doe" class="shelter-input" required>
+                        </div>
+
+                        <div class="shelter-form-group">
+                            <label>Total Penarikan (Rp)</label>
+                            <input type="text" name="total_penarikan" placeholder="Contoh: 500000" class="shelter-input" required>
+                        </div>
+
+                        <div class="shelter-form-group">
+                            <label>Keterangan Penarikan</label>
+                            <textarea name="keterangan" placeholder="Jelaskan tujuan penarikan dana ini..." rows="3" class="shelter-input" required></textarea>
                         </div>
                     </div>
 
                     <!-- Modal Actions -->
                     <div class="shelter-modal-actions">
                         <button type="button" class="shelter-btn-cancel" id="cancelBtn">Batal</button>
-                        <button type="submit" class="shelter-btn-submit">Kirim Bukti</button>
+                        <button type="submit" class="shelter-btn-submit">Ajukan Penarikan</button>
                     </div>
                 </form>
             </div>
@@ -116,12 +125,6 @@
         if (e.target === modal) {
             closeModalFunc();
         }
-    });
-
-    uploadForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('Bukti pengeluaran berhasil dikirim!');
-        closeModalFunc();
     });
 </script>
 

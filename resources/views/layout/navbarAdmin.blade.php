@@ -178,6 +178,9 @@
         <a href="{{ route('admin.donasi') }}" class="{{ request()->routeIs('admin.donasi') ? 'active' : '' }}">
             <i class="fas fa-hand-holding-heart"></i> Donasi
         </a>
+        <a href="{{ route('admin.penarikan') }}" class="{{ request()->routeIs('admin.penarikan') ? 'active' : '' }}">
+            <i class="fas fa-money-bill-wave"></i> Penarikan Dana
+        </a>
     </nav>
     <div class="sidebar-footer">
         <p class="admin-name">Login sebagai: <span>{{ session('admin_nama', 'Admin') }}</span></p>

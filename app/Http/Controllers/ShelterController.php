@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kampanye;
+use App\Models\Penarikan;
 use Illuminate\Http\Request;
 
 class ShelterController extends Controller
@@ -97,22 +98,36 @@ class ShelterController extends Controller
         return redirect()->route('shelter.landingpage')->with('success', 'Kampanye berhasil diperbarui.');
     }
 
-    public function uploadStruk()
+    public function riwayatPenarikan()
     {
-        return view('shelter.UploadStruckShelter');
+        $shelterId = session('shelter_id', 1);
+        $riwayat = Penarikan::where('shelter_id', $shelterId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('shelter.UploadStruckShelter', compact('riwayat'));
     }
 
-    public function storeStruk(Request $request)
+    public function storePenarikan(Request $request)
     {
         $request->validate([
-            'bukti_pengeluaran' => 'required|image|max:2048',
-            'total_pengeluaran' => 'required|string|max:50',
-            'tanggal'           => 'required|string|max:20',
-            'keterangan_pengeluaran' => 'required|string',
+            'bank' => 'required|string|max:50',
+            'nomor_rekening' => 'required|string|max:50',
+            'nama_rekening' => 'required|string|max:100',
+            'total_penarikan' => 'required|numeric|min:10000',
+            'keterangan' => 'required|string',
         ]);
 
-        $request->file('bukti_pengeluaran')->store('struk', 'public');
+        Penarikan::create([
+            'shelter_id' => session('shelter_id', 1),
+            'bank' => $request->bank,
+            'nomor_rekening' => $request->nomor_rekening,
+            'nama_rekening' => $request->nama_rekening,
+            'total_penarikan' => $request->total_penarikan,
+            'keterangan' => $request->keterangan,
+            'status' => 'Diproses',
+        ]);
 
-        return redirect()->route('shelter.landingpage')->with('success', 'Bukti pengeluaran berhasil diupload.');
+        return redirect()->back()->with('success', 'Pengajuan penarikan dana berhasil dikirim!');
     }
 }

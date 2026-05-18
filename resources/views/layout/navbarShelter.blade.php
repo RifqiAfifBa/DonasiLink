@@ -126,7 +126,7 @@
                     <i class="fas fa-wallet me-1"></i>Penarikan
                 </a>
                 <a href="{{ route('shelter.uploadStruk') }}" class="{{ request()->routeIs('shelter.uploadStruk') ? 'active' : '' }}">
-                    <i class="fas fa-receipt me-1"></i>Upload Struk
+                    <i class="fas fa-history me-1"></i>Riwayat Penarikan
                 </a>
             </div>
 
