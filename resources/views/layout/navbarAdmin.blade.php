@@ -144,13 +144,15 @@
             transition: .4s; border-radius: 34px;
         }
         .slider:before {
+            font-family: "Font Awesome 6 Free"; font-weight: 900; content: "\f185";
+            display: flex; align-items: center; justify-content: center; font-size: 9px; color: #fff;
             background-color: var(--accent-secondary);
-            bottom: 3px; content: ""; height: 15px; left: 4px;
+            bottom: 3px; height: 15px; left: 4px;
             position: absolute; transition: .4s; width: 15px; border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         input:checked + .slider { background-color: var(--sidebar-bg); border-color: var(--accent-secondary); }
-        input:checked + .slider:before { transform: translateX(18px); background-color: var(--accent-primary); }
+        input:checked + .slider:before { content: "\f186"; transform: translateX(18px); background-color: var(--accent-primary); }
         .admin-topbar .topbar-right { color: #888; font-size: 13px; }
         .admin-content { padding: 28px; flex: 1; }
     </style>

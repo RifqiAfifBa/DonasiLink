@@ -96,13 +96,15 @@
             transition: .4s; border-radius: 34px;
         }
         .slider:before {
+            font-family: "Font Awesome 6 Free"; font-weight: 900; content: "\f185";
+            display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff;
             background-color: var(--accent-secondary);
-            bottom: 3.5px; content: ""; height: 17px; left: 4px;
+            bottom: 3.5px; height: 17px; left: 4px;
             position: absolute; transition: .4s; width: 17px; border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         input:checked + .slider { background-color: rgba(0,0,0,0.2); }
-        input:checked + .slider:before { transform: translateX(22px); background-color: var(--accent-primary); }
+        input:checked + .slider:before { content: "\f186"; transform: translateX(22px); background-color: var(--accent-primary); }
     </style>
 </head>
 <body>
@@ -135,12 +137,12 @@
                         <div class="slider"></div>
                     </label>
                 </div>
-                <div class="shelter-chip">
+                <!-- <div class="shelter-chip">
                     <div class="shelter-avatar">
                         {{ strtoupper(substr(session('shelter_nama', 'S'), 0, 1)) }}
                     </div>
                     <span class="sname">{{ session('shelter_nama', 'Shelter') }}</span>
-                </div>
+                </div> -->
                 <form action="{{ route('logout') }}" method="POST" style="margin:0">
                     @csrf
                     <button type="submit" class="btn-logout-s">

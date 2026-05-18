@@ -68,13 +68,15 @@
             transition: .4s; border-radius: 34px;
         }
         .slider:before {
+            font-family: "Font Awesome 6 Free"; font-weight: 900; content: "\f185";
+            display: flex; align-items: center; justify-content: center; font-size: 10px; color: #fff;
             background-color: var(--accent-secondary);
-            bottom: 3.5px; content: ""; height: 17px; left: 4px;
+            bottom: 3.5px; height: 17px; left: 4px;
             position: absolute; transition: .4s; width: 17px; border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         input:checked + .slider { background-color: rgba(0,0,0,0.2); }
-        input:checked + .slider:before { transform: translateX(22px); background-color: var(--accent-primary); }
+        input:checked + .slider:before { content: "\f186"; transform: translateX(22px); background-color: var(--accent-primary); }
 
         .dl-btn-login {
             background:var(--text-primary); color:var(--bg-secondary); padding:9px 24px; border-radius:30px;

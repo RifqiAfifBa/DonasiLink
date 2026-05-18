@@ -12,6 +12,7 @@
         font-size: 12px; font-weight: 600; margin-bottom: 12px;
     }
     .feed-header h1 { font-size: 34px; font-weight: 800; color: #1a0f1f; margin-bottom: 8px; }
+    .dark-mode .feed-header h1 { color: #e0d0e6; }
     .feed-header p  { font-size: 15px; color: #888; }
 
     .feed-grid {
