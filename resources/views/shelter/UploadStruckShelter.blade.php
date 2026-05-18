@@ -3,16 +3,7 @@
 @section('content')
 
 <div class="shelter-page-wrapper">
-    <!-- Header -->
-    <div class="shelter-header">
-        <div class="shelter-header-content">
-            <span class="shelter-logo">$ DonasiLink</span>
-            <div class="shelter-nav">
-                <a href="#" class="shelter-nav-link">Dashboard</a>
-                <a href="#" class="shelter-nav-link">Withdrawal Tracking</a>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Form Container -->
     <div class="shelter-form-wrapper">

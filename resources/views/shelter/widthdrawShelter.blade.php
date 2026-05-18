@@ -3,16 +3,7 @@
 @section('content')
 
 <div class="shelter-page-wrapper">
-    <!-- Header -->
-    <div class="shelter-header">
-        <div class="shelter-header-content">
-            <span class="shelter-logo">$ DonasiLink</span>
-            <div class="shelter-nav">
-                <a href="{{ route('shelter.landingpage') }}" class="shelter-nav-link">Dashboard</a>
-                <a href="{{ route('shelter.withdraw') }}" class="shelter-nav-link active">Withdrawal Tracking</a>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Withdrawal List -->
     <div class="shelter-list-wrapper">
