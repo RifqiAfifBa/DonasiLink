@@ -18,16 +18,20 @@ class DonaturController extends Controller
 
         $donatur = Donatur::findOrFail($donaturId);
 
-        // Riwayat donasi berdasarkan email donatur
-        $riwayatDonasi = Donasi::where('email_donatur', $donatur->email)
+        // Riwayat donasi: utamakan donatur_id (linked saat checkout), fallback ke email match.
+        $riwayatDonasi = Donasi::where(function ($q) use ($donatur) {
+                $q->where('donatur_id', $donatur->id)
+                  ->orWhere('email_donatur', $donatur->email);
+            })
             ->with('kampanye')
             ->latest()
             ->get();
 
-        // Statistik donatur
-        $totalDonasi = $riwayatDonasi->where('status', 'berhasil')->sum('jumlah');
-        $jumlahDonasi = $riwayatDonasi->where('status', 'berhasil')->count();
-        $kampanyeDidonasi = $riwayatDonasi->where('status', 'berhasil')->pluck('kampanye_id')->unique()->count();
+        // Statistik: hitung donasi pending/berhasil (tidak termasuk gagal).
+        $valid = $riwayatDonasi->whereNotIn('status', ['gagal']);
+        $totalDonasi      = $valid->sum('jumlah');
+        $jumlahDonasi     = $valid->count();
+        $kampanyeDidonasi = $valid->pluck('kampanye_id')->unique()->count();
 
         // Kampanye aktif untuk quick donate
         $kampanyeAktif = Kampanye::where('status', 'aktif')

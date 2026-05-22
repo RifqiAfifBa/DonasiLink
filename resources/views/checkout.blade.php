@@ -64,12 +64,18 @@
                 </div>
             </div>
 
+            @php
+                $isDonatur     = session('role') === 'donatur';
+                $defaultName   = old('donor_name', $isDonatur ? session('donatur_nama') : '');
+                $defaultEmail  = old('donor_email', $isDonatur ? (auth()->user()->email ?? \App\Models\Donatur::find(session('donatur_id'))?->email) : '');
+            @endphp
+
             <x-form.group label="Nama Lengkap" for="donorName" required :error="$errors->first('donor_name')">
-                <x-form.input name="donor_name" id="donorName" icon="user" placeholder="Masukkan nama lengkap Anda" :value="old('donor_name')" required />
+                <x-form.input name="donor_name" id="donorName" icon="user" placeholder="Masukkan nama lengkap Anda" :value="$defaultName" required />
             </x-form.group>
 
-            <x-form.group label="Email" for="donorEmail" required :error="$errors->first('donor_email')">
-                <x-form.input type="email" name="donor_email" id="donorEmail" icon="envelope" placeholder="Masukkan email Anda" :value="old('donor_email')" required />
+            <x-form.group label="Email" for="donorEmail" required :error="$errors->first('donor_email')" :hint="$isDonatur ? 'Riwayat donasi akan terkait ke akun Anda.' : null">
+                <x-form.input type="email" name="donor_email" id="donorEmail" icon="envelope" placeholder="Masukkan email Anda" :value="$defaultEmail" required />
             </x-form.group>
 
             <div class="grid sm:grid-cols-2 gap-4">

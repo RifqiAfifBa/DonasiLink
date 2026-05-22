@@ -24,13 +24,14 @@ class CheckoutController extends Controller
         ]);
 
         Donasi::create([
-            'kampanye_id'      => $kampanye->id,
-            'nama_donatur'     => $validated['donor_name'],
-            'email_donatur'    => $validated['donor_email'],
-            'no_telepon'       => $validated['donor_phone'],
-            'jumlah'           => $validated['jumlah'],
+            'kampanye_id'       => $kampanye->id,
+            'donatur_id'        => session('role') === 'donatur' ? session('donatur_id') : null,
+            'nama_donatur'      => $validated['donor_name'],
+            'email_donatur'     => $validated['donor_email'],
+            'no_telepon'        => $validated['donor_phone'],
+            'jumlah'            => $validated['jumlah'],
             'metode_pembayaran' => $validated['payment_method'],
-            'status'           => 'pending',
+            'status'            => 'pending',
         ]);
 
         $kampanye->increment('total_terkumpul', $validated['jumlah']);
