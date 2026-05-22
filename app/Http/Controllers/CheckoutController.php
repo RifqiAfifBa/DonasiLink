@@ -35,6 +35,11 @@ class CheckoutController extends Controller
 
         $kampanye->increment('total_terkumpul', $validated['jumlah']);
 
-        return redirect()->route('beranda')->with('success', 'Terima kasih! Donasi Anda sedang diproses.');
+        return redirect()->route('kampanye.show', $kampanye->id)->with('donation_success', [
+            'nama_hewan'  => $kampanye->nama_hewan,
+            'donor_name'  => $validated['donor_name'],
+            'jumlah'      => $validated['jumlah'],
+            'metode'      => $validated['payment_method'],
+        ]);
     }
 }

@@ -1,81 +1,46 @@
-@extends('layout.navbarAdmin')
+@extends('layouts.admin')
+
+@section('title', 'Manajemen Donasi')
 @section('page-title', 'Manajemen Donasi')
+@section('page-subtitle', 'Riwayat seluruh transaksi donasi')
+
 @section('content')
-
-<style>
-    .admin-table-card {
-        background: var(--bg-secondary);
-        border-radius: 14px;
-        box-shadow: 0 2px 8px var(--shadow);
-        border: 1px solid var(--border-color);
-        overflow: hidden;
-    }
-    .admin-table-card thead th {
-        background: var(--bg-primary);
-        color: var(--text-primary);
-        opacity: 0.8;
-        font-size: 12px;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        border: none;
-        padding: 14px 18px;
-    }
-    .admin-table-card tbody td {
-        padding: 13px 18px;
-        font-size: 14px;
-        color: var(--text-primary);
-        border-color: var(--border-color);
-        vertical-align: middle;
-    }
-    .admin-table-card tbody tr:hover { background: var(--bg-primary); }
-    .badge-status {
-        padding: 4px 10px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: 600;
-    }
-    .badge-berhasil { background: #d1fae5; color: #065f46; }
-    .badge-pending  { background: #fef3c7; color: #92400e; }
-    .badge-gagal    { background: #fee2e2; color: #991b1b; }
-</style>
-
-<div class="admin-table-card">
-    <table class="table table-hover mb-0">
-        <thead>
-            <tr>
-                <th>#</th>
-                <th>Donatur</th>
-                <th>Kampanye</th>
-                <th>Jumlah</th>
-                <th>Metode</th>
-                <th>Status</th>
-                <th>Tanggal</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($donasi as $i => $item)
-            <tr>
-                <td>{{ $i + 1 }}</td>
-                <td>
-                    <strong>{{ $item->nama_donatur }}</strong>
-                    <br><small class="text-muted">{{ $item->email_donatur }}</small>
-                </td>
-                <td>{{ $item->kampanye->nama_hewan ?? '-' }}</td>
-                <td><strong>Rp {{ number_format($item->jumlah, 0, ',', '.') }}</strong></td>
-                <td>{{ str_replace('_', ' ', ucfirst($item->metode_pembayaran)) }}</td>
-                <td>
-                    <span class="badge-status badge-{{ $item->status }}">
-                        {{ ucfirst($item->status) }}
-                    </span>
-                </td>
-                <td>{{ $item->created_at->format('d M Y') }}</td>
-            </tr>
-            @empty
-            <tr><td colspan="7" class="text-center text-muted py-5">Belum ada data donasi.</td></tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
-
+<x-table-card title="Semua Donasi" :subtitle="$donasi->count() . ' transaksi'">
+    @if($donasi->count() > 0)
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-ink-200 dark:border-ink-700">
+                    <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400 w-12">#</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Donatur</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Kampanye</th>
+                    <th class="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Jumlah</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Metode</th>
+                    <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Status</th>
+                    <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Tanggal</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-ink-100 dark:divide-ink-700">
+                @foreach($donasi as $i => $item)
+                    @php
+                        $tone = $item->status === 'berhasil' ? 'success' : ($item->status === 'pending' ? 'warning' : 'danger');
+                    @endphp
+                    <tr class="hover:bg-ink-50 dark:hover:bg-ink-900/40 transition-colors">
+                        <td class="px-6 py-4 text-ink-500 dark:text-ink-400">{{ $i + 1 }}</td>
+                        <td class="px-6 py-4">
+                            <p class="font-semibold text-ink-900 dark:text-white">{{ $item->nama_donatur }}</p>
+                            <p class="text-xs text-ink-500 dark:text-ink-400">{{ $item->email_donatur }}</p>
+                        </td>
+                        <td class="px-6 py-4 text-ink-700 dark:text-ink-200">{{ $item->kampanye->nama_hewan ?? '-' }}</td>
+                        <td class="px-6 py-4 text-right font-bold text-brand-700 dark:text-brand-300">Rp {{ number_format($item->jumlah, 0, ',', '.') }}</td>
+                        <td class="px-6 py-4 text-ink-700 dark:text-ink-200">{{ str_replace('_', ' ', ucfirst($item->metode_pembayaran)) }}</td>
+                        <td class="px-6 py-4 text-center"><x-badge :type="$tone">{{ ucfirst($item->status) }}</x-badge></td>
+                        <td class="px-6 py-4 text-ink-500 dark:text-ink-400 text-xs">{{ $item->created_at->format('d M Y') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @else
+        <x-empty-state icon="hand-holding-heart" title="Belum ada data donasi" />
+    @endif
+</x-table-card>
 @endsection

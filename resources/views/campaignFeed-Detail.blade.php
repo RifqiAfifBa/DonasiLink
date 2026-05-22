@@ -1,220 +1,202 @@
-@extends('layout.navbarUser')
+@extends('layouts.public')
+
+@section('title', $kampanye->nama_hewan)
+
 @section('content')
+@php
+    $pct = $kampanye->target_donasi > 0 ? min(($kampanye->total_terkumpul / $kampanye->target_donasi) * 100, 100) : 0;
+    $sakit = $kampanye->sedang_sakit === 'ya';
+@endphp
 
-<style>
-    body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); }
-
-    .detail-page { max-width: 1100px; margin: 0 auto; padding: 48px 24px; }
-
-    /* Breadcrumb */
-    .breadcrumb-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 36px; font-size: 13px; }
-    .breadcrumb-nav a { color: #9b59b6; text-decoration: none; font-weight: 500; }
-    .breadcrumb-nav a:hover { text-decoration: underline; }
-    .breadcrumb-nav .sep { color: #ccc; }
-    .breadcrumb-nav .current { color: #888; }
-
-    /* Main Grid */
-    .detail-grid { display: grid; grid-template-columns: 1fr 400px; gap: 32px; align-items: start; }
-
-    /* Left Column */
-    .detail-img-wrap {
-        border-radius: 20px; overflow: hidden;
-        box-shadow: 0 8px 32px rgba(43,27,47,0.12); margin-bottom: 28px;
-    }
-    .detail-img-wrap img { width: 100%; height: 400px; object-fit: cover; display: block; }
-    .detail-img-placeholder {
-        width: 100%; height: 400px;
-        background: linear-gradient(135deg, #f0e8f5, #e4d4f0);
-        display: flex; align-items: center; justify-content: center; font-size: 96px;
-    }
-
-    .info-card {
-        background: var(--bg-secondary); border-radius: 18px; padding: 28px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 2px 16px var(--shadow); margin-bottom: 20px;
-    }
-    .info-card h3 {
-        font-size: 16px; font-weight: 700; color: var(--text-primary);
-        margin-bottom: 18px; display: flex; align-items: center; gap: 8px;
-    }
-    .info-card h3 i { color: #9b59b6; }
-
-    .animal-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .animal-info-item { background: var(--bg-primary); border-radius: 12px; padding: 14px 16px; }
-    .animal-info-item .label { font-size: 11px; font-weight: 600; color: #b8a0c5; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
-    .animal-info-item .value { font-size: 14px; font-weight: 600; color: var(--text-primary); }
-    .animal-info-item .value.sakit { color: #be123c; }
-    .animal-info-item .value.sehat { color: #166534; }
-
-    .desc-text { font-size: 15px; color: var(--text-secondary); line-height: 1.85; }
-
-    /* Right Column - Sticky Donate Card */
-    .donate-sticky { position: sticky; top: 88px; }
-    .donate-card {
-        background: var(--bg-secondary); border-radius: 20px; padding: 28px;
-        border: 1px solid var(--border-color);
-        box-shadow: 0 8px 32px var(--shadow);
-    }
-    .shelter-tag {
-        display: inline-flex; align-items: center; gap: 6px;
-        background: rgba(155,89,182,0.1); border-radius: 20px;
-        padding: 5px 12px; color: #7c3f8e;
-        font-size: 12px; font-weight: 600; margin-bottom: 12px;
-    }
-    .donate-title { font-size: 24px; font-weight: 800; color: var(--text-primary); margin-bottom: 20px; line-height: 1.2; }
-    .status-badge {
-        display: inline-flex; align-items: center; gap: 6px;
-        padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-bottom: 20px;
-    }
-    .status-badge.sakit { background: #fff1f2; color: #be123c; border: 1px solid #fecdd3; }
-    .status-badge.sehat { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-
-    .progress-section { margin-bottom: 24px; }
-    .progress-numbers { display: flex; justify-content: space-between; margin-bottom: 10px; }
-    .progress-collected { font-size: 22px; font-weight: 800; color: #9b59b6; }
-    .progress-target  { font-size: 13px; color: #aaa; }
-    .progress-bar-outer { width: 100%; height: 10px; background: #f0e8f5; border-radius: 5px; overflow: hidden; }
-    .progress-bar-inner { height: 100%; background: linear-gradient(90deg, #c9a6d4, #9b59b6); border-radius: 5px; }
-    .progress-meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: #bbb; }
-    .progress-meta strong { color: #9b59b6; }
-
-    .btn-donate-now {
-        display: block; width: 100%; text-align: center; padding: 16px;
-        background: linear-gradient(135deg, #c9a6d4 0%, #9b59b6 100%);
-        color: #fff; border-radius: 12px; font-size: 16px; font-weight: 700;
-        text-decoration: none; transition: all 0.25s;
-        box-shadow: 0 8px 24px rgba(155,89,182,0.3); margin-bottom: 12px;
-    }
-    .btn-donate-now:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(155,89,182,0.4); color: #fff; }
-    .btn-back {
-        display: block; width: 100%; text-align: center; padding: 13px;
-        background: var(--bg-primary); color: var(--text-secondary); border-radius: 12px;
-        font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.2s;
-        border: 1px solid var(--border-color);
-    }
-    .btn-back:hover { opacity: 0.9; color: var(--accent-secondary); }
-
-    .share-section { margin-top: 20px; padding-top: 20px; border-top: 1px solid #f0e8f5; }
-    .share-label { font-size: 12px; color: #aaa; font-weight: 500; margin-bottom: 10px; }
-    .share-info { font-size: 13px; color: #888; text-align: center; }
-
-    @media (max-width: 992px) {
-        .detail-grid { grid-template-columns: 1fr; }
-        .donate-sticky { position: static; }
-        .detail-img-wrap img, .detail-img-placeholder { height: 280px; }
-    }
-    @media (max-width: 576px) { .detail-page { padding: 24px 16px; } .animal-info-grid { grid-template-columns: 1fr; } }
-</style>
-
-<div class="detail-page">
-    <!-- Breadcrumb -->
-    <nav class="breadcrumb-nav">
-        <a href="{{ route('beranda') }}"><i class="fas fa-home me-1"></i>Beranda</a>
-        <span class="sep">/</span>
-        <a href="{{ route('kampanye.index') }}">Kampanye</a>
-        <span class="sep">/</span>
-        <span class="current">{{ $kampanye->nama_hewan }}</span>
+<section class="max-w-6xl mx-auto px-6 lg:px-8 py-10 lg:py-14">
+    <nav class="flex items-center gap-2 text-sm mb-8">
+        <a href="{{ route('beranda') }}" class="text-brand-600 dark:text-brand-300 font-medium hover:underline"><i class="fas fa-home mr-1"></i> Beranda</a>
+        <span class="text-ink-300">/</span>
+        <a href="{{ route('kampanye.index') }}" class="text-brand-600 dark:text-brand-300 font-medium hover:underline">Kampanye</a>
+        <span class="text-ink-300">/</span>
+        <span class="text-ink-500 dark:text-ink-400 truncate">{{ $kampanye->nama_hewan }}</span>
     </nav>
 
-    <div class="detail-grid">
-        <!-- Left -->
-        <div class="detail-left">
-            <div class="detail-img-wrap">
+    <div class="grid lg:grid-cols-[1fr_400px] gap-8 items-start">
+        <div class="space-y-6">
+            <div class="rounded-3xl overflow-hidden shadow-xl ring-1 ring-black/5 dark:ring-white/5">
                 @if($kampanye->gambar)
-                    <img src="{{ Storage::url($kampanye->gambar) }}" alt="{{ $kampanye->nama_hewan }}">
+                    <img src="{{ Storage::url($kampanye->gambar) }}" alt="{{ $kampanye->nama_hewan }}" class="w-full h-[400px] object-cover">
                 @else
-                    <div class="detail-img-placeholder">🐾</div>
+                    <div class="w-full h-[400px] bg-gradient-to-br from-brand-100 to-fuchsia-100 dark:from-ink-700 dark:to-ink-800 flex items-center justify-center text-8xl text-brand-400">
+                        <i class="fas fa-paw"></i>
+                    </div>
                 @endif
             </div>
 
-            <!-- Animal Info -->
-            <div class="info-card">
-                <h3><i class="fas fa-paw"></i>Informasi Hewan</h3>
-                <div class="animal-info-grid">
-                    <div class="animal-info-item">
-                        <div class="label">Nama Hewan</div>
-                        <div class="value">{{ $kampanye->nama_hewan }}</div>
-                    </div>
-                    <div class="animal-info-item">
-                        <div class="label">Usia</div>
-                        <div class="value">{{ $kampanye->usia_hewan }}</div>
-                    </div>
-                    <div class="animal-info-item">
-                        <div class="label">Kondisi Kesehatan</div>
-                        <div class="value {{ $kampanye->sedang_sakit === 'ya' ? 'sakit' : 'sehat' }}">
-                            @if($kampanye->sedang_sakit === 'ya')
-                                <i class="fas fa-heartbeat me-1"></i>Sedang Sakit
-                            @else
-                                <i class="fas fa-check-circle me-1"></i>Sehat
-                            @endif
+            <x-card padding="p-7">
+                <h3 class="flex items-center gap-2 text-base font-bold text-ink-900 dark:text-white mb-5">
+                    <i class="fas fa-paw text-brand-500"></i> Informasi Hewan
+                </h3>
+                <div class="grid sm:grid-cols-2 gap-3">
+                    @foreach([
+                        ['label' => 'Nama Hewan', 'value' => $kampanye->nama_hewan],
+                        ['label' => 'Usia',       'value' => $kampanye->usia_hewan],
+                        ['label' => 'Kondisi',    'value' => $sakit ? 'Sedang Sakit' : 'Sehat', 'tone' => $sakit ? 'danger' : 'success'],
+                        ['label' => 'Shelter',    'value' => $kampanye->shelter->nama_shelter ?? '-'],
+                    ] as $info)
+                        <div class="p-4 rounded-2xl bg-ink-50 dark:bg-ink-900">
+                            <p class="text-[11px] font-bold uppercase tracking-wider text-ink-400 dark:text-ink-500">{{ $info['label'] }}</p>
+                            <p class="mt-1 text-sm font-semibold
+                                {{ ($info['tone'] ?? null) === 'danger' ? 'text-rose-600 dark:text-rose-300' : '' }}
+                                {{ ($info['tone'] ?? null) === 'success' ? 'text-emerald-600 dark:text-emerald-300' : '' }}
+                                {{ empty($info['tone'] ?? null) ? 'text-ink-900 dark:text-white' : '' }}">
+                                {{ $info['value'] }}
+                            </p>
                         </div>
-                    </div>
-                    <div class="animal-info-item">
-                        <div class="label">Shelter</div>
-                        <div class="value">{{ $kampanye->shelter->nama_shelter ?? '-' }}</div>
-                    </div>
-                    <div class="animal-info-item" style="grid-column:1/-1">
-                        <div class="label">Kebutuhan</div>
-                        <div class="value">{{ $kampanye->kebutuhan_hewan }}</div>
+                    @endforeach
+                    <div class="sm:col-span-2 p-4 rounded-2xl bg-ink-50 dark:bg-ink-900">
+                        <p class="text-[11px] font-bold uppercase tracking-wider text-ink-400 dark:text-ink-500">Kebutuhan</p>
+                        <p class="mt-1 text-sm font-semibold text-ink-900 dark:text-white">{{ $kampanye->kebutuhan_hewan }}</p>
                     </div>
                 </div>
-            </div>
+            </x-card>
 
-            <!-- Description -->
-            <div class="info-card">
-                <h3><i class="fas fa-align-left"></i>Tentang Kampanye</h3>
-                <p class="desc-text">{{ $kampanye->deskripsi_hewan }}</p>
-            </div>
+            <x-card padding="p-7">
+                <h3 class="flex items-center gap-2 text-base font-bold text-ink-900 dark:text-white mb-4">
+                    <i class="fas fa-align-left text-brand-500"></i> Tentang Kampanye
+                </h3>
+                <p class="text-ink-600 dark:text-ink-300 leading-relaxed whitespace-pre-line">{{ $kampanye->deskripsi_hewan }}</p>
+            </x-card>
+
+            {{-- Transparansi Dana --}}
+            <x-card padding="p-7">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                    <div>
+                        <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[11px] font-bold uppercase tracking-wider">
+                            <i class="fas fa-shield-halved"></i> Transparansi Dana
+                        </span>
+                        <h3 class="mt-2 flex items-center gap-2 text-base font-bold text-ink-900 dark:text-white">
+                            <i class="fas fa-eye text-emerald-500"></i> Penggunaan Dana
+                        </h3>
+                        <p class="text-xs text-ink-500 dark:text-ink-400 mt-0.5">Setiap penarikan yang disetujui ditampilkan di sini lengkap dengan bukti pengeluarannya.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <div class="p-3 rounded-xl bg-brand-50 dark:bg-brand-900/30 border border-brand-100 dark:border-brand-800/50">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-brand-700 dark:text-brand-300">Total Donasi</p>
+                        <p class="mt-1 text-sm font-extrabold text-ink-900 dark:text-white">Rp {{ number_format($kampanye->total_terkumpul, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800/50">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">Sudah Disalurkan</p>
+                        <p class="mt-1 text-sm font-extrabold text-ink-900 dark:text-white">Rp {{ number_format($totalDisetujui, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-ink-100 dark:bg-ink-900 border border-ink-200 dark:border-ink-700">
+                        <p class="text-[10px] font-bold uppercase tracking-wider text-ink-600 dark:text-ink-400">Sisa Saldo</p>
+                        <p class="mt-1 text-sm font-extrabold text-ink-900 dark:text-white">Rp {{ number_format($sisaDana, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+
+                @if($kampanye->penarikan->isEmpty())
+                    <div class="flex flex-col items-center text-center py-8 rounded-2xl bg-ink-50 dark:bg-ink-900 border border-dashed border-ink-200 dark:border-ink-700">
+                        <div class="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center mb-2">
+                            <i class="fas fa-lock"></i>
+                        </div>
+                        <p class="text-sm font-semibold text-ink-900 dark:text-white">Dana masih utuh di kampanye</p>
+                        <p class="text-xs text-ink-500 dark:text-ink-400 mt-1 max-w-sm">Belum ada penarikan yang dicairkan. Setiap penyaluran dana akan tercatat di sini secara transparan.</p>
+                    </div>
+                @else
+                    <ol class="relative space-y-5 pl-6 before:absolute before:left-2 before:top-1.5 before:bottom-1.5 before:w-px before:bg-ink-200 dark:before:bg-ink-700">
+                        @foreach($kampanye->penarikan as $p)
+                            <li class="relative">
+                                <span class="absolute -left-6 top-1.5 w-4 h-4 rounded-full ring-4 ring-white dark:ring-ink-800
+                                    {{ $p->bukti_pengeluaran ? 'bg-emerald-500' : 'bg-amber-400' }}"></span>
+
+                                <div class="rounded-2xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-900 overflow-hidden">
+                                    <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-ink-100 dark:border-ink-700 bg-ink-50 dark:bg-ink-800/40">
+                                        <div>
+                                            <p class="text-xs text-ink-500 dark:text-ink-400">{{ $p->tanggal_disetujui?->format('d M Y') ?? $p->created_at->format('d M Y') }}</p>
+                                            <p class="text-sm font-bold text-ink-900 dark:text-white">{{ $p->keterangan }}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-lg font-extrabold text-brand-700 dark:text-brand-300">Rp {{ number_format($p->total_penarikan, 0, ',', '.') }}</p>
+                                            @if($p->bukti_pengeluaran)
+                                                <span class="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold uppercase"><i class="fas fa-check-double"></i> Terverifikasi</span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1 mt-0.5 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold uppercase"><i class="fas fa-clock"></i> Menunggu Bukti</span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    @if($p->bukti_pengeluaran)
+                                        <div class="grid sm:grid-cols-[200px_1fr] gap-4 p-5">
+                                            <a href="{{ Storage::url($p->bukti_pengeluaran) }}"
+                                               data-lightbox="{{ Storage::url($p->bukti_pengeluaran) }}"
+                                               data-lightbox-alt="Bukti pengeluaran {{ $p->keterangan }}"
+                                               data-lightbox-caption="Bukti pengeluaran &middot; {{ $p->keterangan }} &middot; Rp {{ number_format($p->total_penarikan, 0, ',', '.') }}"
+                                               class="block rounded-xl overflow-hidden ring-1 ring-ink-200 dark:ring-ink-700 hover:ring-brand-400 transition-all bg-ink-100 dark:bg-ink-800 cursor-zoom-in">
+                                                <img src="{{ Storage::url($p->bukti_pengeluaran) }}" alt="Bukti pengeluaran" class="w-full h-32 object-cover">
+                                                <p class="text-[10px] text-center py-1.5 text-brand-600 dark:text-brand-300 font-semibold"><i class="fas fa-search-plus mr-1"></i>Lihat Bukti</p>
+                                            </a>
+                                            <div>
+                                                <p class="text-[11px] font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400 mb-1.5">Rincian Penggunaan</p>
+                                                <p class="text-sm text-ink-700 dark:text-ink-200 leading-relaxed whitespace-pre-line">{{ $p->deskripsi_penggunaan }}</p>
+                                                <p class="mt-3 text-[11px] text-ink-400">Dicairkan ke: <strong>{{ $p->bank }}</strong> a/n {{ $p->nama_rekening }}</p>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <div class="px-5 py-4 text-xs text-ink-500 dark:text-ink-400">
+                                            <i class="fas fa-hourglass-half text-amber-500 mr-1"></i>
+                                            Dana sudah dicairkan ke <strong>{{ $p->bank }}</strong> a/n {{ $p->nama_rekening }}. Bukti pengeluaran sedang menunggu diunggah oleh shelter.
+                                        </div>
+                                    @endif
+                                </div>
+                            </li>
+                        @endforeach
+                    </ol>
+                @endif
+            </x-card>
         </div>
 
-        <!-- Right - Sticky Donate -->
-        <div class="detail-right">
-            <div class="donate-sticky">
-                <div class="donate-card">
-                    <div class="shelter-tag">
-                        <i class="fas fa-home"></i>{{ $kampanye->shelter->nama_shelter ?? 'Shelter' }}
-                    </div>
-                    <h2 class="donate-title">{{ $kampanye->nama_hewan }}</h2>
+        <aside class="lg:sticky lg:top-24">
+            <x-card padding="p-7">
+                <x-badge type="brand"><i class="fas fa-home"></i> {{ $kampanye->shelter->nama_shelter ?? 'Shelter' }}</x-badge>
+                <h2 class="mt-3 text-2xl font-extrabold text-ink-900 dark:text-white leading-tight">{{ $kampanye->nama_hewan }}</h2>
 
-                    @if($kampanye->sedang_sakit === 'ya')
-                        <span class="status-badge sakit"><i class="fas fa-heartbeat"></i>Sedang Membutuhkan Perawatan</span>
+                <div class="mt-4">
+                    @if($sakit)
+                        <x-badge type="danger"><i class="fas fa-heartbeat"></i> Sedang Membutuhkan Perawatan</x-badge>
                     @else
-                        <span class="status-badge sehat"><i class="fas fa-check-circle"></i>Dalam Kondisi Baik</span>
+                        <x-badge type="success"><i class="fas fa-check-circle"></i> Dalam Kondisi Baik</x-badge>
                     @endif
+                </div>
 
-                    <div class="progress-section">
-                        @php $pct = $kampanye->target_donasi > 0 ? min(($kampanye->total_terkumpul/$kampanye->target_donasi)*100, 100) : 0; @endphp
-                        <div class="progress-numbers">
-                            <span class="progress-collected">
-                                Rp {{ number_format($kampanye->total_terkumpul, 0, ',', '.') }}
-                            </span>
-                        </div>
-                        <div class="progress-bar-outer">
-                            <div class="progress-bar-inner" style="width:{{ $pct }}%"></div>
-                        </div>
-                        <div class="progress-meta">
-                            <span>Target: <strong>Rp {{ number_format($kampanye->target_donasi, 0, ',', '.') }}</strong></span>
-                            <span><strong>{{ number_format($pct, 0) }}%</strong> tercapai</span>
-                        </div>
+                <div class="mt-6">
+                    <p class="text-3xl font-extrabold text-brand-700 dark:text-brand-300">
+                        Rp {{ number_format($kampanye->total_terkumpul, 0, ',', '.') }}
+                    </p>
+                    <div class="mt-3 h-2.5 rounded-full bg-ink-100 dark:bg-ink-700 overflow-hidden">
+                        <div class="h-full rounded-full bg-gradient-to-r from-brand-500 to-fuchsia-500" style="width: {{ $pct }}%"></div>
                     </div>
-
-                    <a href="{{ route('checkout.show', $kampanye->id) }}" class="btn-donate-now">
-                        <i class="fas fa-heart me-2"></i>Donasi Sekarang
-                    </a>
-                    <a href="{{ route('kampanye.index') }}" class="btn-back">
-                        <i class="fas fa-arrow-left me-1"></i>Kembali ke Daftar Kampanye
-                    </a>
-
-                    <div class="share-section">
-                        <p class="share-info">
-                            <i class="fas fa-shield-alt me-1" style="color:#9b59b6"></i>
-                            Donasi Anda 100% transparan dan terverifikasi
-                        </p>
+                    <div class="mt-2 flex items-center justify-between text-xs">
+                        <span class="text-ink-500 dark:text-ink-400">Target: <strong class="text-ink-800 dark:text-ink-100">Rp {{ number_format($kampanye->target_donasi, 0, ',', '.') }}</strong></span>
+                        <span class="font-bold text-brand-700 dark:text-brand-300">{{ number_format($pct, 0) }}% tercapai</span>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-</div>
 
+                <div class="mt-6 space-y-2">
+                    <x-button :href="route('checkout.show', $kampanye->id)" variant="primary" size="lg" icon="heart" class="w-full">
+                        Donasi Sekarang
+                    </x-button>
+                    <x-button :href="route('kampanye.index')" variant="ghost" size="md" icon="arrow-left" class="w-full">
+                        Kembali ke Daftar Kampanye
+                    </x-button>
+                </div>
+
+                <div class="mt-6 pt-5 border-t border-ink-200 dark:border-ink-700 text-center">
+                    <p class="text-xs text-ink-500 dark:text-ink-400">
+                        <i class="fas fa-shield-halved text-brand-500 mr-1"></i>
+                        Donasi Anda 100% transparan dan terverifikasi
+                    </p>
+                </div>
+            </x-card>
+        </aside>
+    </div>
+</section>
 @endsection

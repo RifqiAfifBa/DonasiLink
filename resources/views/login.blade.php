@@ -1,266 +1,99 @@
-@extends('layout.navbarLogin')
+@extends('layouts.auth')
+
+@section('title', 'Masuk')
+
 @section('content')
+<div class="grid lg:grid-cols-2 w-full">
+    <aside class="hidden lg:flex relative overflow-hidden bg-gradient-to-br from-ink-900 via-brand-900 to-brand-700 px-12 py-16 flex-col justify-center">
+        <div class="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-brand-500/20 blur-3xl"></div>
+        <div class="absolute -bottom-24 -left-24 w-80 h-80 rounded-full bg-fuchsia-500/15 blur-3xl"></div>
 
-<style>
-    body { font-family: 'Inter', sans-serif; }
+        <div class="relative z-10 max-w-lg">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-brand-200 text-xs font-semibold backdrop-blur-sm">
+                <i class="fas fa-paw"></i> Platform Donasi Hewan
+            </span>
+            <h1 class="mt-8 text-4xl xl:text-5xl font-extrabold text-white leading-tight">
+                Selamat datang di
+                <span class="bg-gradient-to-r from-brand-300 to-fuchsia-300 bg-clip-text text-transparent">DonasiLink</span>
+            </h1>
+            <p class="mt-5 text-base text-brand-200/80 leading-relaxed">
+                Bergabunglah dengan ribuan donatur yang telah membantu hewan-hewan yang membutuhkan.
+            </p>
 
-    /* Split Layout */
-    .login-page {
-        min-height: calc(100vh - 68px);
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-    }
-
-    /* Left Panel */
-    .login-left {
-        background: linear-gradient(160deg, #1a0f1f 0%, #2b1b2f 40%, #4a2060 100%);
-        display: flex; flex-direction: column;
-        justify-content: center; align-items: center;
-        padding: 60px 48px; position: relative; overflow: hidden;
-    }
-    .login-left::before {
-        content: '';
-        position: absolute; top: -100px; right: -100px;
-        width: 400px; height: 400px;
-        background: radial-gradient(circle, rgba(201,166,212,0.12) 0%, transparent 70%);
-        border-radius: 50%;
-    }
-    .login-left::after {
-        content: '';
-        position: absolute; bottom: -80px; left: -80px;
-        width: 300px; height: 300px;
-        background: radial-gradient(circle, rgba(155,89,182,0.1) 0%, transparent 70%);
-        border-radius: 50%;
-    }
-    .left-badge {
-        display: inline-flex; align-items: center; gap: 8px;
-        background: rgba(201,166,212,0.12);
-        border: 1px solid rgba(201,166,212,0.2);
-        border-radius: 30px; padding: 6px 16px;
-        color: #c9a6d4; font-size: 13px; font-weight: 600;
-        margin-bottom: 32px; position: relative; z-index: 1;
-    }
-    .login-left h1 {
-        font-size: 42px; font-weight: 800; color: #fff;
-        line-height: 1.15; margin-bottom: 20px;
-        position: relative; z-index: 1;
-    }
-    .login-left h1 span { color: #c9a6d4; }
-    .login-left p {
-        font-size: 16px; color: #9b7fa8; line-height: 1.7;
-        margin-bottom: 40px; position: relative; z-index: 1;
-    }
-    .left-features { display: flex; flex-direction: column; gap: 16px; position: relative; z-index: 1; width: 100%; }
-    .left-feature-item {
-        display: flex; align-items: center; gap: 14px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(201,166,212,0.12);
-        border-radius: 12px; padding: 14px 18px;
-    }
-    .feature-icon {
-        width: 40px; height: 40px; border-radius: 10px;
-        background: linear-gradient(135deg, rgba(201,166,212,0.2), rgba(155,89,182,0.2));
-        display: flex; align-items: center; justify-content: center;
-        font-size: 18px; flex-shrink: 0;
-    }
-    .feature-text h4 { font-size: 14px; font-weight: 600; color: #e0d0e6; margin: 0 0 2px; }
-    .feature-text p { font-size: 12px; color: #7a6080; margin: 0; }
-
-    /* Right Panel */
-    .login-right {
-        background: var(--bg-secondary);
-        display: flex; flex-direction: column;
-        justify-content: center; padding: 60px 56px;
-    }
-    .login-right .back-link {
-        display: inline-flex; align-items: center; gap: 6px;
-        color: #9b7fa8; font-size: 13px; font-weight: 500;
-        text-decoration: none; margin-bottom: 40px;
-        transition: color 0.2s;
-    }
-    .login-right .back-link:hover { color: #7c3f8e; }
-    .form-title { font-size: 30px; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
-    .form-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 36px; }
-
-    .alert-box {
-        padding: 12px 16px; border-radius: 10px;
-        font-size: 13px; font-weight: 500; margin-bottom: 20px;
-        display: flex; align-items: center; gap: 10px;
-    }
-    .alert-success { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
-    .alert-danger  { background: #fff1f2; color: #9f1239; border: 1px solid #fecdd3; }
-
-    .field-group { margin-bottom: 20px; }
-    .field-label { display: block; font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 7px; }
-    .field-input {
-        width: 100%; padding: 13px 16px;
-        border: 1.5px solid var(--border-color); border-radius: 10px;
-        font-size: 14px; font-family: 'Inter', sans-serif;
-        color: var(--text-primary); background: var(--bg-primary);
-        transition: all 0.2s; outline: none;
-    }
-    .field-input:hover { border-color: var(--accent-primary); }
-    .field-input:focus { border-color: var(--accent-secondary); box-shadow: 0 0 0 3px rgba(155,89,182,0.1); background: var(--bg-secondary); }
-    .field-input::placeholder { color: var(--text-secondary); opacity: 0.6; }
-
-    .input-icon-wrap { position: relative; }
-    .input-icon-wrap .field-icon {
-        position: absolute; left: 14px; top: 50%;
-        transform: translateY(-50%); color: #c9a6d4; font-size: 15px;
-    }
-    .input-icon-wrap .field-input { padding-left: 42px; padding-right: 46px; }
-    .toggle-pw {
-        position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-        background: none; border: none; cursor: pointer; padding: 4px;
-        color: #c9a6d4; font-size: 16px; line-height: 1; transition: color 0.2s;
-        display: flex; align-items: center; justify-content: center;
-    }
-    .toggle-pw:hover { color: #9b59b6; }
-
-    .remember-row {
-        display: flex; justify-content: space-between; align-items: center;
-        margin-bottom: 24px;
-    }
-    .remember-label {
-        display: flex; align-items: center; gap: 8px;
-        font-size: 13px; color: var(--text-secondary); cursor: pointer;
-    }
-    .remember-label input { accent-color: var(--accent-secondary); width: 16px; height: 16px; }
-
-    .btn-submit-login {
-        width: 100%; padding: 15px;
-        background: linear-gradient(135deg, #c9a6d4 0%, #9b59b6 100%);
-        color: #fff; border: none; border-radius: 10px;
-        font-size: 15px; font-weight: 700; cursor: pointer;
-        box-shadow: 0 8px 24px rgba(155,89,182,0.3);
-        transition: all 0.25s; letter-spacing: 0.2px;
-    }
-    .btn-submit-login:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(155,89,182,0.4); }
-    .btn-submit-login:active { transform: translateY(0); }
-
-    .divider { text-align: center; margin: 24px 0; position: relative; }
-    .divider::before {
-        content: ''; position: absolute;
-        top: 50%; left: 0; right: 0; height: 1px; background: var(--border-color);
-    }
-    .divider span {
-        background: var(--bg-secondary); padding: 0 12px;
-        font-size: 12px; color: var(--text-secondary); position: relative;
-    }
-    .signup-link { text-align: center; font-size: 14px; color: #888; margin-top: 4px; }
-    .signup-link a { color: #9b59b6; font-weight: 600; text-decoration: none; }
-    .signup-link a:hover { text-decoration: underline; }
-
-    @media (max-width: 768px) {
-        .login-page { grid-template-columns: 1fr; }
-        .login-left { display: none; }
-        .login-right { padding: 40px 28px; }
-    }
-</style>
-
-<div class="login-page">
-    <!-- Left Panel -->
-    <div class="login-left">
-        <div class="left-badge">🐾 Platform Donasi Hewan</div>
-        <h1>Selamat datang di <span>DonasiLink</span></h1>
-        <p>Bergabunglah dengan ribuan donatur yang telah membantu hewan-hewan yang membutuhkan.</p>
-        <div class="left-features">
-            <div class="left-feature-item">
-                <div class="feature-icon">🛡️</div>
-                <div class="feature-text">
-                    <h4>Aman & Terpercaya</h4>
-                    <p>Setiap donasi diverifikasi dan transparan</p>
-                </div>
-            </div>
-            <div class="left-feature-item">
-                <div class="feature-icon">📊</div>
-                <div class="feature-text">
-                    <h4>Pantau Donasi Anda</h4>
-                    <p>Dashboard lengkap riwayat donasi</p>
-                </div>
-            </div>
-            <div class="left-feature-item">
-                <div class="feature-icon">🐕</div>
-                <div class="feature-text">
-                    <h4>Dampak Nyata</h4>
-                    <p>Lihat langsung perubahan yang Anda buat</p>
-                </div>
+            <div class="mt-10 space-y-3">
+                @foreach([
+                    ['icon' => 'shield-halved', 'title' => 'Aman & Terpercaya', 'desc' => 'Setiap donasi diverifikasi dan transparan'],
+                    ['icon' => 'chart-line',    'title' => 'Pantau Donasi Anda', 'desc' => 'Dashboard lengkap riwayat donasi'],
+                    ['icon' => 'heart',         'title' => 'Dampak Nyata',       'desc' => 'Lihat langsung perubahan yang Anda buat'],
+                ] as $feat)
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm">
+                        <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-brand-400/30 to-brand-600/30 flex items-center justify-center text-brand-200">
+                            <i class="fas fa-{{ $feat['icon'] }}"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-white">{{ $feat['title'] }}</p>
+                            <p class="text-xs text-brand-200/70">{{ $feat['desc'] }}</p>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </div>
-    </div>
+    </aside>
 
-    <!-- Right Panel -->
-    <div class="login-right">
-        <a href="{{ route('beranda') }}" class="back-link">
-            <i class="fas fa-arrow-left"></i> Kembali ke Beranda
-        </a>
+    <section class="flex flex-col justify-center px-6 sm:px-10 lg:px-16 py-12 bg-white dark:bg-ink-900">
+        <div class="w-full max-w-md mx-auto">
+            <a href="{{ route('beranda') }}" class="inline-flex items-center gap-2 text-sm font-medium text-ink-500 hover:text-brand-600 dark:text-ink-400 dark:hover:text-brand-300 transition-colors mb-8">
+                <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+            </a>
 
-        <h2 class="form-title">Masuk ke Akun</h2>
-        <p class="form-subtitle">Masukkan email atau username dan password Anda</p>
+            <h2 class="text-3xl font-extrabold text-ink-900 dark:text-white">Masuk ke Akun</h2>
+            <p class="mt-2 text-sm text-ink-500 dark:text-ink-400">Masukkan email atau username dan password Anda.</p>
 
-        @if(session('success'))
-            <div class="alert-box alert-success">
-                <i class="fas fa-check-circle"></i> {{ session('success') }}
-            </div>
-        @endif
-        @if($errors->any())
-            <div class="alert-box alert-danger">
-                <i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}
-            </div>
-        @endif
+            @if(session('success'))
+                <x-alert type="success" class="mt-6">{{ session('success') }}</x-alert>
+            @endif
+            @if($errors->any())
+                <x-alert type="danger" class="mt-6">{{ $errors->first() }}</x-alert>
+            @endif
 
-        <form action="{{ route('login.post') }}" method="POST">
-            @csrf
-            <div class="field-group">
-                <label class="field-label" for="email">Email / Username</label>
-                <div class="input-icon-wrap">
-                    <i class="fas fa-user field-icon"></i>
-                    <input type="text" id="email" name="email" class="field-input"
-                        placeholder="Masukkan email atau username" value="{{ old('email') }}" required>
-                </div>
-            </div>
-            <div class="field-group">
-                <label class="field-label" for="password">Password</label>
-                <div class="input-icon-wrap">
-                    <i class="fas fa-lock field-icon"></i>
-                    <input type="password" id="password" name="password" class="field-input"
-                        placeholder="Masukkan password Anda" required>
-                    <button type="button" class="toggle-pw" onclick="togglePassword('password', this)" tabindex="-1">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="remember-row">
-                <label class="remember-label">
-                    <input type="checkbox" name="remember"> Ingat saya
+            <form action="{{ route('login.post') }}" method="POST" class="mt-7 space-y-5">
+                @csrf
+                <x-form.group label="Email / Username" for="email" required>
+                    <x-form.input name="email" id="email" icon="user" placeholder="Masukkan email atau username" :value="old('email')" required />
+                </x-form.group>
+
+                <x-form.group label="Password" for="password" required>
+                    <div class="relative" x-data>
+                        <x-form.input type="password" name="password" id="password" icon="lock" placeholder="Masukkan password Anda" class="pr-12" required />
+                        <button type="button"
+                                onclick="(function(b){const i=document.getElementById('password');const ic=b.querySelector('i');const isPw=i.type==='password';i.type=isPw?'text':'password';ic.classList.toggle('fa-eye',!isPw);ic.classList.toggle('fa-eye-slash',isPw);})(this)"
+                                class="absolute right-4 top-1/2 -translate-y-1/2 text-ink-400 hover:text-brand-600 dark:hover:text-brand-300 transition-colors"
+                                tabindex="-1" aria-label="Toggle password">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </x-form.group>
+
+                <label class="flex items-center gap-2 text-sm text-ink-600 dark:text-ink-300 cursor-pointer">
+                    <input type="checkbox" name="remember" class="w-4 h-4 rounded border-ink-300 text-brand-600 focus:ring-brand-500">
+                    Ingat saya
                 </label>
+
+                <x-button type="submit" variant="primary" size="lg" icon="sign-in-alt" class="w-full">
+                    Masuk
+                </x-button>
+            </form>
+
+            <div class="relative my-7">
+                <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-ink-200 dark:border-ink-700"></div></div>
+                <div class="relative flex justify-center"><span class="px-3 bg-white dark:bg-ink-900 text-xs text-ink-400">atau</span></div>
             </div>
-            <button type="submit" class="btn-submit-login">
-                <i class="fas fa-sign-in-alt me-2"></i>Masuk
-            </button>
-        </form>
 
-        <div class="divider"><span>atau</span></div>
-        <p class="signup-link">
-            Belum punya akun? <a href="{{ route('register') }}">Daftar sekarang</a>
-        </p>
-    </div>
+            <p class="text-center text-sm text-ink-500 dark:text-ink-400">
+                Belum punya akun?
+                <a href="{{ route('register') }}" class="font-semibold text-brand-600 dark:text-brand-300 hover:underline">Daftar sekarang</a>
+            </p>
+        </div>
+    </section>
 </div>
-
-<script>
-function togglePassword(fieldId, btn) {
-    const input = document.getElementById(fieldId);
-    const icon = btn.querySelector('i');
-    if (input.type === 'password') {
-        input.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
-        btn.title = 'Sembunyikan password';
-    } else {
-        input.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
-        btn.title = 'Tampilkan password';
-    }
-}
-</script>
-
 @endsection

@@ -1,243 +1,100 @@
-@extends('layout.navbarLogin')
+@extends('layouts.public')
+
+@section('title', 'Beranda')
+
 @section('content')
-<style>
-    body { font-family:'Inter',sans-serif; background: var(--bg-primary); color: var(--text-primary); }
+<section class="relative overflow-hidden bg-gradient-to-br from-brand-50 via-white to-fuchsia-50 dark:from-ink-900 dark:via-ink-900 dark:to-brand-950">
+    <div class="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-brand-300/30 dark:bg-brand-700/20 blur-3xl"></div>
+    <div class="absolute top-40 -left-32 w-80 h-80 rounded-full bg-fuchsia-300/20 dark:bg-fuchsia-800/20 blur-3xl"></div>
 
-    /* ── HERO ── */
-    .hero {
-        background: var(--navbar-bg);
-        padding: 72px 0 0;
-        overflow: hidden;
-        position: relative;
-    }
-    .hero-inner {
-        max-width:1200px; margin:0 auto; padding:0 32px;
-        display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:flex-end;
-    }
-    .hero-left { padding-bottom: 56px; }
-    .hero-label {
-        display:inline-flex; align-items:center; gap:6px;
-        background:rgba(255,255,255,0.2); border-radius:30px;
-        padding:5px 16px; font-size:12px; font-weight:600; color:var(--text-primary);
-        margin-bottom:20px;
-    }
-    .hero-title {
-        font-size:46px; font-weight:800; color:var(--text-primary); line-height:1.15;
-        margin-bottom:18px; letter-spacing:-1px;
-    }
-    .hero-desc { font-size:16px; color:var(--text-secondary); line-height:1.75; margin-bottom:36px; max-width:480px; }
-    .hero-cta { display:flex; gap:14px; flex-wrap:wrap; }
-    .btn-cta-primary {
-        background:var(--text-primary); color:var(--bg-secondary); padding:14px 32px; border-radius:30px;
-        font-size:15px; font-weight:700; text-decoration:none; transition:all 0.25s;
-        display:inline-flex; align-items:center; gap:8px;
-    }
-    .btn-cta-primary:hover { opacity: 0.9; transform:translateY(-1px); }
-    .btn-cta-outline {
-        background:rgba(255,255,255,0.2); color:var(--text-primary); border:2px solid var(--border-color);
-        padding:13px 32px; border-radius:30px; font-size:15px; font-weight:600;
-        text-decoration:none; transition:all 0.25s; display:inline-flex; align-items:center; gap:8px;
-    }
-    .btn-cta-outline:hover { background:rgba(255,255,255,0.4); }
-    .hero-right {
-        display:flex; align-items:flex-end; justify-content:center;
-    }
-    .hero-img {
-        width:100%; max-width:460px; border-radius:20px 20px 0 0;
-        object-fit:cover; height:420px; display:block;
-        box-shadow: 0 -8px 40px rgba(43,27,47,0.15);
-    }
-
-    /* Stats Bar */
-    .stats-bar {
-        background:var(--text-primary); padding:28px 0;
-    }
-    .stats-bar-inner {
-        max-width:1200px; margin:0 auto; padding:0 32px;
-        display:grid; grid-template-columns:repeat(3,1fr); gap:20px;
-    }
-    .stat-item { text-align:center; }
-    .stat-item h3 { font-size:32px; font-weight:800; color:var(--accent-primary); margin:0 0 4px; }
-    .stat-item p  { font-size:13px; color:var(--text-secondary); opacity: 0.8; margin:0; }
-
-    /* ── FEATURES ── */
-    .features { background:var(--bg-secondary); padding:80px 0; }
-    .features-inner { max-width:1200px; margin:0 auto; padding:0 32px; }
-    .section-head { text-align:center; margin-bottom:48px; }
-    .section-tag {
-        display:inline-block; background:var(--bg-primary); color:var(--accent-secondary);
-        font-size:12px; font-weight:700; padding:5px 16px; border-radius:30px; margin-bottom:12px;
-        text-transform:uppercase; letter-spacing:0.5px;
-    }
-    .section-title { font-size:34px; font-weight:800; color:var(--text-primary); margin-bottom:10px; }
-    .section-desc  { font-size:15px; color:var(--text-secondary); }
-    .features-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; }
-    .feat-card {
-        background:var(--bg-primary); border-radius:20px; padding:32px;
-        border:1px solid var(--border-color); transition:all 0.3s;
-    }
-    .feat-card:hover { transform:translateY(-4px); box-shadow:0 12px 40px var(--shadow); }
-    .feat-icon {
-        width:56px; height:56px; border-radius:16px; margin-bottom:20px;
-        display:flex; align-items:center; justify-content:center; font-size:24px;
-        background:var(--accent-primary);
-    }
-    .feat-card h3 { font-size:18px; font-weight:700; color:var(--text-primary); margin-bottom:10px; }
-    .feat-card p  { font-size:14px; color:var(--text-secondary); line-height:1.7; margin:0; }
-
-    /* ── CAMPAIGNS ── */
-    .campaigns { background:var(--bg-primary); padding:80px 0; }
-    .campaigns-inner { max-width:1200px; margin:0 auto; padding:0 32px; }
-    .camps-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:48px; }
-    .camp-card {
-        background:var(--bg-secondary); border-radius:20px; overflow:hidden;
-        box-shadow:0 4px 20px var(--shadow);
-        border:1px solid var(--border-color); transition:all 0.3s;
-    }
-    .camp-card:hover { transform:translateY(-5px); box-shadow:0 16px 48px var(--shadow); }
-    .camp-img { width:100%; height:196px; object-fit:cover; display:block; }
-    .camp-img-ph {
-        width:100%; height:196px; background:linear-gradient(135deg, var(--bg-primary), var(--accent-primary));
-        display:flex; align-items:center; justify-content:center; font-size:56px;
-    }
-    .camp-body { padding:20px; }
-    .camp-shelter { font-size:12px; color:var(--accent-secondary); font-weight:600; margin-bottom:6px; }
-    .camp-name  { font-size:17px; font-weight:700; color:var(--text-primary); margin-bottom:6px; }
-    .camp-desc  { font-size:13px; color:var(--text-secondary); line-height:1.6; margin-bottom:14px; }
-    .camp-status {
-        display:inline-flex; align-items:center; gap:5px;
-        font-size:11px; font-weight:700; padding:4px 12px; border-radius:30px; margin-bottom:14px;
-    }
-    .camp-status.sakit { background:#fce8ee; color:#c2688c; }
-    .camp-status.sehat { background:#e8f5e9; color:#388e3c; }
-    .prog-bar { width:100%; height:8px; background:var(--bg-primary); border-radius:4px; overflow:hidden; margin-bottom:8px; }
-    .prog-fill { height:100%; background:linear-gradient(90deg,var(--accent-primary),var(--accent-secondary)); border-radius:4px; }
-    .prog-info { display:flex; justify-content:space-between; font-size:12px; color:var(--text-secondary); opacity: 0.8; margin-bottom:16px; }
-    .prog-info strong { color:var(--accent-secondary); }
-    .btn-donate {
-        display:block; width:100%; text-align:center; padding:12px;
-        background:var(--accent-primary); color:var(--text-primary); border-radius:30px;
-        font-size:14px; font-weight:700; text-decoration:none; transition:all 0.2s;
-    }
-    .btn-donate:hover { opacity: 0.9; transform:translateY(-1px); }
-    .empty-camp { grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-secondary); }
-    .view-all-wrap { text-align:center; margin-top:40px; }
-    .btn-view-all {
-        display:inline-flex; align-items:center; gap:8px;
-        background:var(--text-primary); color:var(--bg-secondary); padding:14px 36px; border-radius:30px;
-        font-size:14px; font-weight:600; text-decoration:none; transition:all 0.2s;
-    }
-    .btn-view-all:hover { opacity: 0.9; transform:translateY(-1px); }
-
-    @media(max-width:992px){
-        .hero-inner,.features-grid,.camps-grid{grid-template-columns:1fr;}
-        .hero-right{display:none;}
-        .hero-title{font-size:34px;}
-        .stats-bar-inner{grid-template-columns:1fr;}
-    }
-</style>
-
-{{-- HERO --}}
-<section class="hero">
-    <div class="hero-inner">
-        <div class="hero-left">
-            <div class="hero-label">🐾 Platform Donasi Hewan</div>
-            <h1 class="hero-title">Bantu Mereka<br>Menemukan<br>Kebahagiaan Kembali</h1>
-            <p class="hero-desc">DonasiLink menghubungkan Anda dengan shelter hewan yang membutuhkan bantuan. Transparansi penuh, dampak nyata untuk hewan-hewan tercinta.</p>
-            <div class="hero-cta">
-                <a href="{{ route('kampanye.index') }}" class="btn-cta-primary">
-                    ❤️ Donasi Sekarang
-                </a>
-                <a href="{{ route('impact-story') }}" class="btn-cta-outline">
-                    📖 Impact Story
-                </a>
+    <div class="relative max-w-7xl mx-auto px-6 lg:px-8 pt-16 lg:pt-24 pb-20 grid lg:grid-cols-2 gap-12 items-center">
+        <div>
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-100/80 dark:bg-brand-900/40 text-brand-700 dark:text-brand-200 text-xs font-bold backdrop-blur-sm">
+                <i class="fas fa-paw"></i> Platform Donasi Hewan Terpercaya
+            </span>
+            <h1 class="mt-6 text-4xl sm:text-5xl lg:text-6xl font-black leading-[1.05] tracking-tight text-ink-900 dark:text-white">
+                Bantu Mereka<br>
+                <span class="bg-gradient-to-r from-brand-600 to-fuchsia-600 bg-clip-text text-transparent">Menemukan</span><br>
+                Kebahagiaan Kembali
+            </h1>
+            <p class="mt-6 max-w-xl text-base lg:text-lg text-ink-600 dark:text-ink-300 leading-relaxed">
+                DonasiLink menghubungkan Anda dengan shelter hewan yang membutuhkan bantuan. Transparansi penuh, dampak nyata untuk hewan-hewan tercinta.
+            </p>
+            <div class="mt-8 flex flex-wrap items-center gap-3">
+                <x-button :href="route('kampanye.index')" variant="primary" size="lg" icon="heart">Donasi Sekarang</x-button>
+                <x-button :href="route('impact-story')" variant="secondary" size="lg" icon="book-open">Impact Story</x-button>
             </div>
         </div>
-        <div class="hero-right">
-            <img src="{{ asset('Asset/Pic/kucing.jpeg') }}" class="hero-img" alt="Hewan yang membutuhkan">
+        <div class="relative hidden lg:block">
+            <div class="absolute inset-0 -m-6 rounded-[2rem] bg-gradient-to-tr from-brand-500/20 to-fuchsia-500/20 blur-2xl"></div>
+            <img src="{{ asset('Asset/Pic/kucing.jpeg') }}" alt="Hewan yang membutuhkan"
+                 class="relative w-full max-h-[460px] object-cover rounded-3xl shadow-2xl ring-1 ring-black/5">
         </div>
     </div>
-</section>
 
-{{-- STATS --}}
-<div class="stats-bar">
-    <div class="stats-bar-inner">
-        <div class="stat-item"><h3>100+</h3><p>Hewan Terselamatkan</p></div>
-        <div class="stat-item"><h3>50+</h3><p>Donatur Aktif</p></div>
-        <div class="stat-item"><h3>10+</h3><p>Shelter Terverifikasi</p></div>
-    </div>
-</div>
-
-{{-- FEATURES --}}
-<section class="features">
-    <div class="features-inner">
-        <div class="section-head">
-            <div class="section-tag">✨ Mengapa DonasiLink?</div>
-            <h2 class="section-title">Platform yang Anda Percaya</h2>
-            <p class="section-desc">Setiap donasi Anda tersalurkan dengan tepat dan transparan</p>
-        </div>
-        <div class="features-grid">
-            <div class="feat-card">
-                <div class="feat-icon">🛡️</div>
-                <h3>100% Transparan</h3>
-                <p>Setiap rupiah donasi Anda dapat dipantau secara real-time dengan laporan keuangan terbuka.</p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon">🐕</div>
-                <h3>Untuk Hewan Nyata</h3>
-                <p>Semua kampanye terverifikasi langsung dari shelter mitra kami. Hewan yang ditampilkan benar-benar membutuhkan.</p>
-            </div>
-            <div class="feat-card">
-                <div class="feat-icon">📊</div>
-                <h3>Pantau Dampak</h3>
-                <p>Dapatkan update perkembangan hewan yang Anda donasikan dan lihat impact story dari donatur lain.</p>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- CAMPAIGNS --}}
-<section class="campaigns">
-    <div class="campaigns-inner">
-        <div class="section-head">
-            <div class="section-tag">🐾 Kampanye Terkini</div>
-            <h2 class="section-title">Mereka Menunggu Bantuan Anda</h2>
-            <p class="section-desc">Pilih kampanye dan mulai berdonasi hari ini</p>
-        </div>
-        <div class="camps-grid">
-            @forelse($kampanye as $item)
-            <div class="camp-card">
-                @if($item->gambar)
-                    <img src="{{ Storage::url($item->gambar) }}" class="camp-img" alt="{{ $item->nama_hewan }}">
-                @else
-                    <div class="camp-img-ph">🐾</div>
-                @endif
-                <div class="camp-body">
-                    <p class="camp-shelter">🏠 {{ $item->shelter->nama_shelter ?? 'Shelter' }}</p>
-                    <h3 class="camp-name">{{ $item->nama_hewan }}</h3>
-                    <p class="camp-desc">{{ Str::limit($item->deskripsi_hewan, 80) }}</p>
-                    @if($item->sedang_sakit === 'ya')
-                        <span class="camp-status sakit">💊 Sedang Sakit</span>
-                    @else
-                        <span class="camp-status sehat">✅ Sehat</span>
-                    @endif
-                    @php $pct = $item->target_donasi > 0 ? min(($item->total_terkumpul/$item->target_donasi)*100,100) : 0; @endphp
-                    <div class="prog-bar"><div class="prog-fill" style="width:{{ $pct }}%"></div></div>
-                    <div class="prog-info">
-                        <span>Terkumpul: <strong>Rp {{ number_format($item->total_terkumpul,0,',','.') }}</strong></span>
-                        <span>{{ number_format($pct,0) }}%</span>
-                    </div>
-                    <a href="{{ route('kampanye.show', $item->id) }}" class="btn-donate">Donasi Sekarang</a>
+    <div class="relative bg-ink-900 dark:bg-black/40">
+        <div class="max-w-7xl mx-auto px-6 lg:px-8 py-8 grid grid-cols-3 gap-6">
+            @foreach([
+                ['n' => '100+', 'l' => 'Hewan Terselamatkan'],
+                ['n' => '50+',  'l' => 'Donatur Aktif'],
+                ['n' => '10+',  'l' => 'Shelter Terverifikasi'],
+            ] as $s)
+                <div class="text-center">
+                    <p class="text-3xl sm:text-4xl font-black bg-gradient-to-r from-brand-300 to-fuchsia-300 bg-clip-text text-transparent">{{ $s['n'] }}</p>
+                    <p class="mt-1 text-xs sm:text-sm text-ink-400">{{ $s['l'] }}</p>
                 </div>
-            </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+<section class="py-20 bg-white dark:bg-ink-900">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto">
+            <span class="inline-block px-3 py-1 rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-200 text-xs font-bold uppercase tracking-wider">Mengapa DonasiLink?</span>
+            <h2 class="mt-3 text-3xl sm:text-4xl font-extrabold text-ink-900 dark:text-white">Platform yang Anda Percaya</h2>
+            <p class="mt-3 text-ink-500 dark:text-ink-400">Setiap donasi Anda tersalurkan dengan tepat dan transparan.</p>
+        </div>
+
+        <div class="mt-12 grid md:grid-cols-3 gap-6">
+            @foreach([
+                ['icon' => 'shield-halved', 'title' => '100% Transparan', 'desc' => 'Setiap rupiah donasi Anda dapat dipantau secara real-time dengan laporan keuangan terbuka.'],
+                ['icon' => 'paw',           'title' => 'Untuk Hewan Nyata', 'desc' => 'Semua kampanye terverifikasi langsung dari shelter mitra kami.'],
+                ['icon' => 'chart-line',    'title' => 'Pantau Dampak',     'desc' => 'Dapatkan update perkembangan hewan yang Anda donasikan.'],
+            ] as $f)
+                <div class="group p-7 rounded-3xl bg-gradient-to-br from-ink-50 to-white dark:from-ink-800 dark:to-ink-800/40 border border-ink-100 dark:border-ink-700 hover:border-brand-300 dark:hover:border-brand-700 hover:-translate-y-1 transition-all duration-300 shadow-[0_1px_3px_rgba(15,23,42,0.04)] hover:shadow-[0_18px_40px_rgba(124,58,237,0.12)]">
+                    <div class="w-14 h-14 rounded-2xl btn-gradient flex items-center justify-center text-white text-xl shadow-lg group-hover:scale-110 transition-transform">
+                        <i class="fas fa-{{ $f['icon'] }}"></i>
+                    </div>
+                    <h3 class="mt-5 text-lg font-bold text-ink-900 dark:text-white">{{ $f['title'] }}</h3>
+                    <p class="mt-2 text-sm text-ink-600 dark:text-ink-400 leading-relaxed">{{ $f['desc'] }}</p>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</section>
+
+<section class="py-20 bg-ink-50 dark:bg-ink-900/50">
+    <div class="max-w-7xl mx-auto px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto">
+            <span class="inline-block px-3 py-1 rounded-full bg-brand-100 dark:bg-brand-900/40 text-brand-700 dark:text-brand-200 text-xs font-bold uppercase tracking-wider">Kampanye Terkini</span>
+            <h2 class="mt-3 text-3xl sm:text-4xl font-extrabold text-ink-900 dark:text-white">Mereka Menunggu Bantuan Anda</h2>
+            <p class="mt-3 text-ink-500 dark:text-ink-400">Pilih kampanye dan mulai berdonasi hari ini.</p>
+        </div>
+
+        <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            @forelse($kampanye as $item)
+                @include('partials.campaign-card', ['item' => $item])
             @empty
-            <div class="empty-camp"><p style="font-size:48px;margin-bottom:12px">🐾</p><p>Belum ada kampanye aktif.</p></div>
+                <div class="col-span-full">
+                    <x-empty-state icon="paw" title="Belum ada kampanye aktif" message="Pantau terus untuk update kampanye terbaru." />
+                </div>
             @endforelse
         </div>
-        <div class="view-all-wrap">
-            <a href="{{ route('kampanye.index') }}" class="btn-view-all">Lihat Semua Kampanye →</a>
+
+        <div class="mt-12 text-center">
+            <x-button :href="route('kampanye.index')" variant="dark" size="lg" icon="arrow-right">Lihat Semua Kampanye</x-button>
         </div>
     </div>
 </section>
-
 @endsection

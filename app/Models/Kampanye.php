@@ -27,6 +27,11 @@ class Kampanye extends Model
         return $this->hasMany(Donasi::class);
     }
 
+    public function penarikan()
+    {
+        return $this->hasMany(Penarikan::class);
+    }
+
     public function persentase(): int
     {
         if ($this->target_donasi <= 0) return 0;

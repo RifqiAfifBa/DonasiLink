@@ -36,6 +36,8 @@ Route::get('/shelter/riwayat-penarikan', [ShelterController::class, 'riwayatPena
 Route::get('/shelter/update/{kampanye}', [ShelterController::class, 'updateForm'])->name('shelter.updateForm');
 Route::put('/shelter/update/{kampanye}', [ShelterController::class, 'updateKampanye'])->name('shelter.updateKampanye');
 Route::post('/shelter/ajukan-penarikan', [ShelterController::class, 'storePenarikan'])->name('shelter.storePenarikan');
+Route::get('/shelter/penarikan/{penarikan}/bukti', [ShelterController::class, 'uploadBuktiForm'])->name('shelter.bukti.form');
+Route::post('/shelter/penarikan/{penarikan}/bukti', [ShelterController::class, 'storeBukti'])->name('shelter.bukti.store');
 
 // Admin
 Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
@@ -45,6 +47,10 @@ Route::get('/admin/donasi',    [AdminController::class, 'donasi'])->name('admin.
 Route::get('/admin/penarikan', [AdminController::class, 'penarikan'])->name('admin.penarikan');
 Route::post('/admin/penarikan/{penarikan}/accept', [AdminController::class, 'acceptPenarikan'])->name('admin.penarikan.accept');
 Route::post('/admin/penarikan/{penarikan}/reject', [AdminController::class, 'rejectPenarikan'])->name('admin.penarikan.reject');
+Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
+Route::post('/admin/users', [AdminController::class, 'storeUser'])->name('admin.users.store');
+Route::post('/admin/users/{type}/{id}/promote', [AdminController::class, 'promoteToAdmin'])->name('admin.users.promote');
+Route::delete('/admin/users/{type}/{id}', [AdminController::class, 'destroyUser'])->name('admin.users.destroy');
 
 // Donatur
 Route::get('/donatur/dashboard', [DonaturController::class, 'dashboard'])->name('donatur.dashboard');

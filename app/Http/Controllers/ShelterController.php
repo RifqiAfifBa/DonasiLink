@@ -58,7 +58,16 @@ class ShelterController extends Controller
         $shelterId = session('shelter_id', 1);
         $kampanye = Kampanye::where('shelter_id', $shelterId)
             ->where('total_terkumpul', '>', 0)
-            ->get();
+            ->get()
+            ->map(function ($k) {
+                $disetujui = Penarikan::where('kampanye_id', $k->id)
+                    ->where('status', 'Berhasil')
+                    ->sum('total_penarikan');
+                $k->sisa_dana = max(0, $k->total_terkumpul - $disetujui);
+                return $k;
+            })
+            ->filter(fn($k) => $k->sisa_dana > 0)
+            ->values();
 
         return view('shelter.widthdrawShelter', compact('kampanye'));
     }
@@ -101,7 +110,8 @@ class ShelterController extends Controller
     public function riwayatPenarikan()
     {
         $shelterId = session('shelter_id', 1);
-        $riwayat = Penarikan::where('shelter_id', $shelterId)
+        $riwayat = Penarikan::with('kampanye')
+            ->where('shelter_id', $shelterId)
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -110,24 +120,93 @@ class ShelterController extends Controller
 
     public function storePenarikan(Request $request)
     {
-        $request->validate([
-            'bank' => 'required|string|max:50',
-            'nomor_rekening' => 'required|string|max:50',
-            'nama_rekening' => 'required|string|max:100',
+        $shelterId = session('shelter_id', 1);
+
+        $validated = $request->validate([
+            'kampanye_id'     => 'required|exists:kampanye,id',
+            'bank'            => 'required|string|max:50',
+            'nomor_rekening'  => 'required|string|max:50',
+            'nama_rekening'   => 'required|string|max:100',
             'total_penarikan' => 'required|numeric|min:10000',
-            'keterangan' => 'required|string',
+            'keterangan'      => 'required|string',
         ]);
+
+        $kampanye = Kampanye::where('id', $validated['kampanye_id'])
+            ->where('shelter_id', $shelterId)
+            ->first();
+
+        if (!$kampanye) {
+            return back()->with('error', 'Kampanye tidak valid atau bukan milik shelter Anda.');
+        }
+
+        $totalDisetujui = Penarikan::where('kampanye_id', $kampanye->id)
+            ->where('status', 'Berhasil')
+            ->sum('total_penarikan');
+        $sisaDana = max(0, $kampanye->total_terkumpul - $totalDisetujui);
+
+        if ($validated['total_penarikan'] > $sisaDana) {
+            return back()->with('error', 'Nominal melebihi sisa dana kampanye yang dapat ditarik (Rp ' . number_format($sisaDana, 0, ',', '.') . ').');
+        }
 
         Penarikan::create([
-            'shelter_id' => session('shelter_id', 1),
-            'bank' => $request->bank,
-            'nomor_rekening' => $request->nomor_rekening,
-            'nama_rekening' => $request->nama_rekening,
-            'total_penarikan' => $request->total_penarikan,
-            'keterangan' => $request->keterangan,
-            'status' => 'Diproses',
+            'shelter_id'      => $shelterId,
+            'kampanye_id'     => $kampanye->id,
+            'bank'            => $validated['bank'],
+            'nomor_rekening'  => $validated['nomor_rekening'],
+            'nama_rekening'   => $validated['nama_rekening'],
+            'total_penarikan' => $validated['total_penarikan'],
+            'keterangan'      => $validated['keterangan'],
+            'status'          => 'Diproses',
         ]);
 
-        return redirect()->back()->with('success', 'Pengajuan penarikan dana berhasil dikirim!');
+        return redirect()->route('shelter.uploadStruk')
+            ->with('success', 'Pengajuan penarikan dana berhasil dikirim. Menunggu persetujuan admin.');
+    }
+
+    public function uploadBuktiForm(Penarikan $penarikan)
+    {
+        $shelterId = session('shelter_id', 1);
+        if ($penarikan->shelter_id != $shelterId) {
+            abort(403, 'Anda tidak memiliki akses ke penarikan ini.');
+        }
+        if ($penarikan->status !== 'Berhasil') {
+            return redirect()->route('shelter.uploadStruk')
+                ->with('error', 'Bukti hanya dapat diunggah setelah penarikan disetujui.');
+        }
+
+        $penarikan->load('kampanye');
+        return view('shelter.uploadBukti', compact('penarikan'));
+    }
+
+    public function storeBukti(Request $request, Penarikan $penarikan)
+    {
+        $shelterId = session('shelter_id', 1);
+        if ($penarikan->shelter_id != $shelterId) {
+            abort(403);
+        }
+        if ($penarikan->status !== 'Berhasil') {
+            return back()->with('error', 'Bukti hanya dapat diunggah setelah penarikan disetujui.');
+        }
+
+        $validated = $request->validate([
+            'bukti_pengeluaran'    => 'required|image|max:4096',
+            'deskripsi_penggunaan' => 'required|string|min:20|max:2000',
+        ], [
+            'bukti_pengeluaran.required' => 'Foto bukti pengeluaran wajib diunggah.',
+            'bukti_pengeluaran.image'    => 'File harus berupa gambar (JPG, PNG, WEBP).',
+            'bukti_pengeluaran.max'      => 'Ukuran gambar maksimal 4 MB.',
+            'deskripsi_penggunaan.min'   => 'Deskripsi penggunaan dana minimal 20 karakter.',
+        ]);
+
+        $path = $request->file('bukti_pengeluaran')->store('bukti-pengeluaran', 'public');
+
+        $penarikan->update([
+            'bukti_pengeluaran'    => $path,
+            'deskripsi_penggunaan' => $validated['deskripsi_penggunaan'],
+            'tanggal_selesai'      => now(),
+        ]);
+
+        return redirect()->route('shelter.uploadStruk')
+            ->with('success', 'Bukti pengeluaran berhasil diunggah. Donatur sekarang dapat melihat transparansi dana ini.');
     }
 }
