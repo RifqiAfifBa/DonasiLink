@@ -14,7 +14,8 @@
         </div>
 
         <div class="flex items-center gap-2">
-            <x-theme-toggle variant="button" />
+            <x-theme-toggle />
+            <x-notification-bell />
             <div class="hidden sm:flex items-center gap-2 pl-1 pr-3 py-1 rounded-full bg-brand-50 dark:bg-ink-800 border border-brand-100 dark:border-ink-700">
                 <span class="w-7 h-7 rounded-full btn-gradient text-white text-xs font-bold flex items-center justify-center">{{ strtoupper(substr(session('donatur_nama','D'),0,1)) }}</span>
                 <span class="text-sm font-semibold text-ink-800 dark:text-ink-100">{{ session('donatur_nama','Donatur') }}</span>

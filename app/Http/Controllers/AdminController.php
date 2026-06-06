@@ -10,6 +10,8 @@ use App\Models\Donatur;
 use App\Models\Kampanye;
 use App\Models\Donasi;
 use App\Models\Penarikan;
+use App\Helpers\ChartHelper;
+use App\Services\NotificationService;
 
 class AdminController extends Controller
 {
@@ -22,6 +24,9 @@ class AdminController extends Controller
     {
         if (!$this->checkAdmin()) return redirect()->route('login');
 
+        // Chart data: transaction volume
+        $transactionVolumeData = ChartHelper::getTransactionVolumeData(6);
+
         return view('admin.dashboard', [
             'totalShelter'  => Shelter::count(),
             'totalDonatur'  => Donatur::count(),
@@ -29,6 +34,7 @@ class AdminController extends Controller
             'totalDonasi'   => Donasi::count(),
             'shelters'      => Shelter::with('kampanye')->get(),
             'kampanye'      => Kampanye::with('shelter')->latest()->get(),
+            'transactionVolumeData' => $transactionVolumeData,
         ]);
     }
 
@@ -80,6 +86,31 @@ class AdminController extends Controller
             'status'            => 'Berhasil',
             'tanggal_disetujui' => $penarikan->tanggal_disetujui ?? now(),
         ]);
+
+        // Create notifications
+        $shelter = $penarikan->shelter;
+        $kampanye = $penarikan->kampanye;
+
+        // Notify shelter that withdrawal is approved
+        NotificationService::notifyShelter(
+            $shelter,
+            'penarikan_disetujui',
+            'Penarikan Dana Disetujui',
+            "Penarikan dana untuk kampanye '{$kampanye->nama_hewan}' sebesar Rp " . number_format($penarikan->total_penarikan, 0, ',', '.') . " telah disetujui. Silakan unggah bukti pengeluaran.",
+            'Penarikan',
+            $penarikan->id,
+            ['kampanye_id' => $kampanye->id, 'total' => $penarikan->total_penarikan]
+        );
+
+        // Notify all admins
+        NotificationService::notifyAllAdmins(
+            'penarikan_disetujui',
+            'Penarikan Dana Disetujui',
+            "Penarikan untuk {$shelter->nama_shelter} ({$kampanye->nama_hewan}) telah disetujui.",
+            'Penarikan',
+            $penarikan->id
+        );
+
         return redirect()->back()->with('success', 'Penarikan disetujui. Shelter wajib mengunggah bukti pengeluaran.');
     }
 
@@ -88,6 +119,30 @@ class AdminController extends Controller
         if (!$this->checkAdmin()) return redirect()->route('login');
 
         $penarikan->update(['status' => 'Gagal']);
+
+        // Create notifications
+        $shelter = $penarikan->shelter;
+        $kampanye = $penarikan->kampanye;
+
+        // Notify shelter that withdrawal is rejected
+        NotificationService::notifyShelter(
+            $shelter,
+            'penarikan_ditolak',
+            'Penarikan Dana Ditolak',
+            "Penarikan dana untuk kampanye '{$kampanye->nama_hewan}' sebesar Rp " . number_format($penarikan->total_penarikan, 0, ',', '.') . " telah ditolak. Silakan hubungi admin untuk informasi lebih lanjut.",
+            'Penarikan',
+            $penarikan->id
+        );
+
+        // Notify all admins
+        NotificationService::notifyAllAdmins(
+            'penarikan_ditolak',
+            'Penarikan Dana Ditolak',
+            "Penarikan untuk {$shelter->nama_shelter} ({$kampanye->nama_hewan}) telah ditolak.",
+            'Penarikan',
+            $penarikan->id
+        );
+
         return redirect()->back()->with('success', 'Penarikan telah ditolak.');
     }
 

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Kampanye;
 use App\Models\Penarikan;
+use App\Models\Admin;
 use Illuminate\Http\Request;
+use App\Services\NotificationService;
 
 class ShelterController extends Controller
 {
@@ -148,7 +150,7 @@ class ShelterController extends Controller
             return back()->with('error', 'Nominal melebihi sisa dana kampanye yang dapat ditarik (Rp ' . number_format($sisaDana, 0, ',', '.') . ').');
         }
 
-        Penarikan::create([
+        $penarikan = Penarikan::create([
             'shelter_id'      => $shelterId,
             'kampanye_id'     => $kampanye->id,
             'bank'            => $validated['bank'],
@@ -158,6 +160,18 @@ class ShelterController extends Controller
             'keterangan'      => $validated['keterangan'],
             'status'          => 'Diproses',
         ]);
+
+        // Load relationships for notifications
+        $penarikan->load(['shelter']);
+
+        // Notify all admins about withdrawal request
+        NotificationService::notifyAllAdmins(
+            'penarikan_diajukan',
+            'Pengajuan Penarikan Dana Baru',
+            "Shelter '{$penarikan->shelter->nama_shelter}' mengajukan penarikan dana untuk kampanye '{$kampanye->nama_hewan}' sebesar Rp " . number_format($penarikan->total_penarikan, 0, ',', '.') . ".",
+            'Penarikan',
+            $penarikan->id
+        );
 
         return redirect()->route('shelter.uploadStruk')
             ->with('success', 'Pengajuan penarikan dana berhasil dikirim. Menunggu persetujuan admin.');
@@ -205,6 +219,26 @@ class ShelterController extends Controller
             'deskripsi_penggunaan' => $validated['deskripsi_penggunaan'],
             'tanggal_selesai'      => now(),
         ]);
+
+        // Load relationships for notifications
+        $penarikan->load(['kampanye', 'shelter']);
+
+        // Notify all admins about proof upload
+        NotificationService::notifyAllAdmins(
+            'bukti_diunggah',
+            'Bukti Pengeluaran Diunggah',
+            "Shelter '{$penarikan->shelter->nama_shelter}' telah mengunggah bukti pengeluaran untuk kampanye '{$penarikan->kampanye->nama_hewan}' sebesar Rp " . number_format($penarikan->total_penarikan, 0, ',', '.') . ".",
+            'Penarikan',
+            $penarikan->id
+        );
+
+        // Notify donors about impact evidence
+        NotificationService::notifyDonorsOfImpact(
+            $penarikan->kampanye_id,
+            'Bukti Dampak Diunggah',
+            "Shelter '{$penarikan->shelter->nama_shelter}' telah mengunggah bukti penggunaan dana untuk kampanye '{$penarikan->kampanye->nama_hewan}'. Lihat transparansi dana untuk detail selengkapnya.",
+            ['penarikan_id' => $penarikan->id, 'shelter_name' => $penarikan->shelter->nama_shelter]
+        );
 
         return redirect()->route('shelter.uploadStruk')
             ->with('success', 'Bukti pengeluaran berhasil diunggah. Donatur sekarang dapat melihat transparansi dana ini.');

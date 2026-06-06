@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Kampanye;
+use App\Helpers\ChartHelper;
 
 class KampanyeController extends Controller
 {
@@ -26,6 +27,9 @@ class KampanyeController extends Controller
         $totalTerpakai  = $kampanye->penarikan->whereNotNull('bukti_pengeluaran')->sum('total_penarikan');
         $sisaDana       = max(0, $kampanye->total_terkumpul - $totalDisetujui);
 
-        return view('campaignFeed-Detail', compact('kampanye', 'totalDisetujui', 'totalTerpakai', 'sisaDana'));
+        // Chart data: fund distribution
+        $fundDistributionData = ChartHelper::getCampaignFundDistribution($kampanye);
+
+        return view('campaignFeed-Detail', compact('kampanye', 'totalDisetujui', 'totalTerpakai', 'sisaDana', 'fundDistributionData'));
     }
 }
