@@ -80,7 +80,7 @@
                 @php $pct = $item->target_donasi > 0 ? min(($item->total_terkumpul / $item->target_donasi) * 100, 100) : 0; @endphp
                 <li class="flex items-center gap-4 p-3 rounded-2xl bg-ink-50 dark:bg-ink-900 hover:bg-brand-50 dark:hover:bg-ink-800 border border-ink-100 dark:border-ink-700 transition-colors">
                     @if($item->gambar)
-                    <img src="{{ Storage::url($item->gambar) }}" alt="{{ $item->nama_hewan }}" class="w-14 h-14 rounded-xl object-cover shrink-0">
+                    <img src="{{ route('foto.show', $item->gambar) }}" alt="{{ $item->nama_hewan }}" class="w-14 h-14 rounded-xl object-cover shrink-0">
                     @else
                     <div class="w-14 h-14 rounded-xl btn-gradient flex items-center justify-center text-white shrink-0">
                         <i class="fas fa-paw"></i>

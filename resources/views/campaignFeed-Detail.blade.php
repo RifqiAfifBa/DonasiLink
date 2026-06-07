@@ -25,7 +25,7 @@ $sakit = $kampanye->sedang_sakit === 'ya';
         <div class="space-y-6">
             <div class="rounded-3xl overflow-hidden shadow-xl ring-1 ring-black/5 dark:ring-white/5">
                 @if($kampanye->gambar)
-                <img src="{{ Storage::url($kampanye->gambar) }}" alt="{{ $kampanye->nama_hewan }}" class="w-full h-[400px] object-cover">
+                <img src="{{ route('foto.show', $kampanye->gambar) }}" alt="{{ $kampanye->nama_hewan }}" class="w-full h-[400px] object-cover">
                 @else
                 <div class="w-full h-[400px] bg-gradient-to-br from-brand-100 to-fuchsia-100 dark:from-ink-700 dark:to-ink-800 flex items-center justify-center text-8xl text-brand-400">
                     <i class="fas fa-paw"></i>
@@ -130,12 +130,12 @@ $sakit = $kampanye->sedang_sakit === 'ya';
 
                             @if($p->bukti_pengeluaran)
                             <div class="grid sm:grid-cols-[200px_1fr] gap-4 p-5">
-                                <a href="{{ Storage::url($p->bukti_pengeluaran) }}"
-                                    data-lightbox="{{ Storage::url($p->bukti_pengeluaran) }}"
+                                <a href="{{ route('foto.show', $p->bukti_pengeluaran) }}"
+                                    data-lightbox="{{ route('foto.show', $p->bukti_pengeluaran) }}"
                                     data-lightbox-alt="Bukti pengeluaran {{ $p->keterangan }}"
                                     data-lightbox-caption="Bukti pengeluaran &middot; {{ $p->keterangan }} &middot; Rp {{ number_format($p->total_penarikan, 0, ',', '.') }}"
                                     class="block rounded-xl overflow-hidden ring-1 ring-ink-200 dark:ring-ink-700 hover:ring-brand-400 transition-all bg-ink-100 dark:bg-ink-800 cursor-zoom-in">
-                                    <img src="{{ Storage::url($p->bukti_pengeluaran) }}" alt="Bukti pengeluaran" class="w-full h-32 object-cover">
+                                    <img src="{{ route('foto.show', $p->bukti_pengeluaran) }}" alt="Bukti pengeluaran" class="w-full h-32 object-cover">
                                     <p class="text-[10px] text-center py-1.5 text-brand-600 dark:text-brand-300 font-semibold"><i class="fas fa-search-plus mr-1"></i>Lihat Bukti</p>
                                 </a>
                                 <div>

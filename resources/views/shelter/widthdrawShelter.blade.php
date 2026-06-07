@@ -25,7 +25,7 @@
     <div class="mt-8 space-y-4">
         @forelse($kampanye as $item)
             <article class="flex flex-col sm:flex-row sm:items-center gap-4 p-5 bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700 rounded-2xl shadow-[0_1px_3px_rgba(15,23,42,0.05)] hover:shadow-[0_8px_24px_rgba(124,58,237,0.10)] transition-shadow">
-                <img src="{{ $item->gambar ? Storage::url($item->gambar) : asset('Asset/Pic/kucing.jpeg') }}" alt="{{ $item->nama_hewan }}" class="w-full sm:w-24 h-24 rounded-xl object-cover">
+                <img src="{{ $item->gambar ? route('foto.show', $item->gambar) : asset('Asset/Pic/kucing.jpeg') }}" alt="{{ $item->nama_hewan }}" class="w-full sm:w-24 h-24 rounded-xl object-cover">
                 <div class="flex-1 min-w-0">
                     <h3 class="text-base font-bold text-ink-900 dark:text-white">{{ $item->nama_hewan }}</h3>
                     <p class="mt-1 text-sm text-ink-500 dark:text-ink-400 line-clamp-2">{{ Str::limit($item->deskripsi_hewan, 100) }}</p>

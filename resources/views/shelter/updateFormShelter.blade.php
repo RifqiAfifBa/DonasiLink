@@ -29,7 +29,7 @@
                 <div id="uploadZone" class="relative rounded-2xl border-2 border-dashed border-ink-200 dark:border-ink-700 bg-ink-50 dark:bg-ink-900 hover:border-brand-400 transition-colors cursor-pointer overflow-hidden">
                     <input type="file" name="image" id="imageInput" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer z-10" onchange="previewImg(this)">
                     @if($kampanye->gambar)
-                        <img src="{{ Storage::url($kampanye->gambar) }}" id="img-preview" alt="{{ $kampanye->nama_hewan }}" class="w-full h-60 object-cover">
+                        <img src="{{ route('foto.show', $kampanye->gambar) }}" id="img-preview" alt="{{ $kampanye->nama_hewan }}" class="w-full h-60 object-cover">
                         <div id="imgOverlay" class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-ink-900/80 to-transparent text-white pointer-events-none">
                             <p class="text-sm font-semibold"><i class="fas fa-camera mr-1"></i>Klik untuk ganti foto</p>
                             <p class="text-xs text-white/70">Kosongkan jika tidak ingin mengganti foto.</p>

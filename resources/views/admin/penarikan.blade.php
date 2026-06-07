@@ -71,11 +71,11 @@
                                     </div>
                                 @elseif($item->isCompleted())
                                     <div class="flex flex-col items-center gap-2">
-                                        <a href="{{ Storage::url($item->bukti_pengeluaran) }}"
-                                           data-lightbox="{{ Storage::url($item->bukti_pengeluaran) }}"
+                                        <a href="{{ route('foto.show', $item->bukti_pengeluaran) }}"
+                                           data-lightbox="{{ route('foto.show', $item->bukti_pengeluaran) }}"
                                            data-lightbox-caption="Bukti pengeluaran &middot; {{ $item->kampanye->nama_hewan ?? 'Penarikan' }} &middot; Rp {{ number_format($item->total_penarikan, 0, ',', '.') }}"
                                            class="block w-20 h-20 rounded-lg overflow-hidden ring-2 ring-emerald-300 dark:ring-emerald-700 hover:ring-emerald-500 transition-all cursor-zoom-in">
-                                            <img src="{{ Storage::url($item->bukti_pengeluaran) }}" alt="Bukti" class="w-full h-full object-cover">
+                                            <img src="{{ route('foto.show', $item->bukti_pengeluaran) }}" alt="Bukti" class="w-full h-full object-cover">
                                         </a>
                                         @if($item->deskripsi_penggunaan)
                                             <button type="button" onclick="toggleDeskripsi({{ $item->id }})" class="text-[11px] font-semibold text-brand-600 dark:text-brand-300 hover:underline">Lihat Rincian</button>

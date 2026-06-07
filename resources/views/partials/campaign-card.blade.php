@@ -6,7 +6,7 @@
 <article class="group flex flex-col bg-white dark:bg-ink-800 border border-ink-200 dark:border-ink-700 rounded-3xl overflow-hidden shadow-[0_1px_3px_rgba(15,23,42,0.04)] hover:shadow-[0_18px_40px_rgba(124,58,237,0.14)] hover:-translate-y-1 transition-all duration-300">
     <div class="relative aspect-[16/10] overflow-hidden bg-gradient-to-br from-brand-100 to-fuchsia-100 dark:from-ink-700 dark:to-ink-800">
         @if($item->gambar)
-            <img src="{{ Storage::url($item->gambar) }}" alt="{{ $item->nama_hewan }}"
+            <img src="{{ route('foto.show', $item->gambar) }}" alt="{{ $item->nama_hewan }}"
                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
         @else
             <div class="flex items-center justify-center w-full h-full text-6xl text-brand-400 dark:text-brand-600">

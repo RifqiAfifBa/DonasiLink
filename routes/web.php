@@ -9,9 +9,13 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DonaturController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\FotoController;
 
 // Beranda
 Route::get('/', [BerandaController::class, 'index'])->name('beranda');
+
+// Foto (disajikan dari database supaya tetap tampil di lingkungan lain)
+Route::get('/foto/{path}', [FotoController::class, 'show'])->where('path', '.*')->name('foto.show');
 
 // Campaign Feed
 Route::get('/CampaignFeed', [KampanyeController::class, 'index'])->name('kampanye.index');

@@ -65,8 +65,8 @@
                                 @if($item->isApproved())
                                     <x-button :href="route('shelter.bukti.form', $item->id)" variant="primary" size="sm" icon="upload">Upload Bukti</x-button>
                                 @elseif($item->isCompleted() && $item->bukti_pengeluaran)
-                                    <a href="{{ Storage::url($item->bukti_pengeluaran) }}"
-                                       data-lightbox="{{ Storage::url($item->bukti_pengeluaran) }}"
+                                    <a href="{{ route('foto.show', $item->bukti_pengeluaran) }}"
+                                       data-lightbox="{{ route('foto.show', $item->bukti_pengeluaran) }}"
                                        data-lightbox-caption="Bukti pengeluaran &middot; {{ $item->kampanye->nama_hewan ?? 'Penarikan' }} &middot; Rp {{ number_format($item->total_penarikan, 0, ',', '.') }}"
                                        class="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 dark:text-brand-300 hover:underline cursor-zoom-in">
                                         <i class="fas fa-image"></i> Lihat Bukti

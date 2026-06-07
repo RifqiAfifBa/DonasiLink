@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Kampanye;
 use App\Models\Penarikan;
 use App\Models\Admin;
+use App\Models\Foto;
 use Illuminate\Http\Request;
 use App\Services\NotificationService;
 
@@ -38,7 +39,7 @@ class ShelterController extends Controller
 
         $gambar = null;
         if ($request->hasFile('image')) {
-            $gambar = $request->file('image')->store('kampanye', 'public');
+            $gambar = Foto::simpanDariUpload($request->file('image'), 'kampanye');
         }
 
         Kampanye::create([
@@ -101,7 +102,7 @@ class ShelterController extends Controller
         ];
 
         if ($request->hasFile('image')) {
-            $data['gambar'] = $request->file('image')->store('kampanye', 'public');
+            $data['gambar'] = Foto::simpanDariUpload($request->file('image'), 'kampanye');
         }
 
         $kampanye->update($data);
@@ -212,7 +213,7 @@ class ShelterController extends Controller
             'deskripsi_penggunaan.min'   => 'Deskripsi penggunaan dana minimal 20 karakter.',
         ]);
 
-        $path = $request->file('bukti_pengeluaran')->store('bukti-pengeluaran', 'public');
+        $path = Foto::simpanDariUpload($request->file('bukti_pengeluaran'), 'bukti-pengeluaran');
 
         $penarikan->update([
             'bukti_pengeluaran'    => $path,
