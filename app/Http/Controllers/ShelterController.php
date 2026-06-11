@@ -56,7 +56,7 @@ class ShelterController extends Controller
         return redirect()->route('shelter.landingpage')->with('success', 'Kampanye berhasil dipublikasikan!');
     }
 
-    public function widthdrawShelter()
+    public function withdrawShelter()
     {
         $shelterId = session('shelter_id', 1);
         $kampanye = Kampanye::where('shelter_id', $shelterId)
@@ -72,7 +72,7 @@ class ShelterController extends Controller
             ->filter(fn($k) => $k->sisa_dana > 0)
             ->values();
 
-        return view('shelter.widthdrawShelter', compact('kampanye'));
+        return view('shelter.withdrawShelter', compact('kampanye'));
     }
 
     public function updateForm(Kampanye $kampanye)
@@ -118,7 +118,7 @@ class ShelterController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
-        return view('shelter.UploadStruckShelter', compact('riwayat'));
+        return view('shelter.UploadStrukShelter', compact('riwayat'));
     }
 
     public function storePenarikan(Request $request)

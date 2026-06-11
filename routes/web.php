@@ -32,7 +32,7 @@ Route::get('/impact-story', function () {
     return view('impact-story');
 })->name('impact-story');
 
-Route::get('/foto/{path}', [FotoController::class, 'show'])->name('foto.show');
+Route::get('/foto/{path}', [FotoController::class, 'show'])->where('path', '.*')->name('foto.show');
 
 // Donatur Routes
 Route::prefix('donatur')->name('donatur.')->group(function () {
@@ -46,7 +46,7 @@ Route::prefix('shelter')->name('shelter.')->group(function () {
     Route::post('/kampanye', [ShelterController::class, 'storeKampanye'])->name('storeKampanye');
     Route::get('/kampanye/{kampanye}/edit', [ShelterController::class, 'updateForm'])->name('updateForm');
     Route::put('/kampanye/{kampanye}', [ShelterController::class, 'updateKampanye'])->name('updateKampanye');
-    Route::get('/withdraw', [ShelterController::class, 'widthdrawShelter'])->name('withdraw');
+    Route::get('/withdraw', [ShelterController::class, 'withdrawShelter'])->name('withdraw');
     Route::post('/withdraw', [ShelterController::class, 'storePenarikan'])->name('storePenarikan');
     Route::get('/riwayat', [ShelterController::class, 'riwayatPenarikan'])->name('uploadStruk');
     Route::get('/penarikan/{penarikan}/bukti', [ShelterController::class, 'uploadBuktiForm'])->name('bukti.form');

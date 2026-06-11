@@ -27,7 +27,7 @@
         </div>
         <div class="relative hidden lg:block">
             <div class="absolute inset-0 -m-6 rounded-[2rem] bg-gradient-to-tr from-brand-500/20 to-fuchsia-500/20 blur-2xl"></div>
-            <img src="{{ asset('Asset/Pic/kucing.jpeg') }}" alt="Hewan yang membutuhkan"
+            <img src="{{ asset('Asset/Pic/kucing.jpeg') }}" alt="Hewan yang membutuhkan" loading="lazy"
                  class="relative w-full max-h-[460px] object-cover rounded-3xl shadow-2xl ring-1 ring-black/5">
         </div>
     </div>
