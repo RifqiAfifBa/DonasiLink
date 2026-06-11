@@ -11,8 +11,37 @@
             try {
                 var t = localStorage.getItem('theme');
                 if (t === 'dark') document.documentElement.classList.add('dark');
+                else if (t === 'light') document.documentElement.classList.remove('dark');
             } catch (e) {}
         })();
+        function toggleTheme(isDark) {
+            document.documentElement.classList.toggle('dark', isDark);
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.querySelectorAll('[data-theme-toggle]').forEach(function(el) {
+                if (el.type === 'checkbox') el.checked = isDark;
+            });
+        }
+        document.addEventListener('click', function(e) {
+            var toggle = e.target.closest('[data-theme-toggle]');
+            if (toggle) {
+                if (toggle.tagName === 'BUTTON') {
+                    e.preventDefault();
+                    toggleTheme(!document.documentElement.classList.contains('dark'));
+                }
+            }
+        });
+        document.addEventListener('change', function(e) {
+            var toggle = e.target.closest('[data-theme-toggle]');
+            if (toggle && toggle.type === 'checkbox') {
+                toggleTheme(toggle.checked);
+            }
+        });
+        document.addEventListener('DOMContentLoaded', function() {
+            var isDark = document.documentElement.classList.contains('dark');
+            document.querySelectorAll('[data-theme-toggle]').forEach(function(el) {
+                if (el.type === 'checkbox') el.checked = isDark;
+            });
+        });
     </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
