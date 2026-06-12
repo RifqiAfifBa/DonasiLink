@@ -6,6 +6,11 @@
 
 @section('content')
 <x-table-card title="Semua Donasi" :subtitle="$donasi->count() . ' transaksi'">
+    @if(session('success'))
+        <div class="px-6 pt-4">
+            <x-alert type="success">{{ session('success') }}</x-alert>
+        </div>
+    @endif
     @if($donasi->count() > 0)
         <table class="w-full text-sm">
             <thead>
@@ -17,6 +22,7 @@
                     <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Metode</th>
                     <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Status</th>
                     <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Tanggal</th>
+                    <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-ink-100 dark:divide-ink-700">
@@ -35,6 +41,28 @@
                         <td class="px-6 py-4 text-ink-700 dark:text-ink-200">{{ str_replace('_', ' ', ucfirst($item->metode_pembayaran)) }}</td>
                         <td class="px-6 py-4 text-center"><x-badge :type="$tone">{{ ucfirst($item->status) }}</x-badge></td>
                         <td class="px-6 py-4 text-ink-500 dark:text-ink-400 text-xs">{{ $item->created_at->format('d M Y') }}</td>
+                        <td class="px-6 py-4 text-center">
+                            @if($item->status === 'pending')
+                                <div class="flex items-center justify-center gap-1">
+                                    <form action="{{ route('admin.donasi.accept', $item->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white text-xs font-bold transition-colors"
+                                                onclick="return confirm('Setujui donasi ini?')">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.donasi.reject', $item->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="px-3 py-1.5 rounded-lg bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold transition-colors"
+                                                onclick="return confirm('Tolak donasi ini?')">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            @else
+                                <span class="text-xs text-ink-400">-</span>
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

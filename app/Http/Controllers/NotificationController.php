@@ -9,27 +9,35 @@ use Illuminate\Http\JsonResponse;
 class NotificationController extends Controller
 {
     /**
-     * Get unread notifications for the current user
+     * Get notifications — JSON for dropdown, view for full page
      */
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse|\Illuminate\View\View
     {
         $userId = $this->getUserId();
         $userType = $this->getUserType();
 
         if (!$userId || !$userType) {
-            return response()->json(['notifications' => [], 'unread_count' => 0]);
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['notifications' => [], 'unread_count' => 0]);
+            }
+            return redirect()->route('login');
         }
 
         $query = Notification::where($this->getWhereColumn($userType), $userId);
+        $unreadCount = (clone $query)->whereNull('read_at')->count();
 
-        $unreadCount = $query->whereNull('read_at')->count();
+        // JSON response for dropdown
+        if ($request->expectsJson() || $request->ajax()) {
+            $notifications = $query->latest()->take(10)->get();
+            return response()->json([
+                'notifications' => $notifications,
+                'unread_count' => $unreadCount,
+            ]);
+        }
 
-        $notifications = $query->latest()->take(10)->get();
-
-        return response()->json([
-            'notifications' => $notifications,
-            'unread_count' => $unreadCount,
-        ]);
+        // HTML view for full page
+        $notifications = $query->latest()->paginate(20);
+        return view('notifications.index', compact('notifications', 'unreadCount'));
     }
 
     /**

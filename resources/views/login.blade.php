@@ -52,6 +52,9 @@
             @if(session('success'))
                 <x-alert type="success" class="mt-6">{{ session('success') }}</x-alert>
             @endif
+            @if(session('info'))
+                <x-alert type="info" class="mt-6">{{ session('info') }}</x-alert>
+            @endif
             @if($errors->any())
                 <x-alert type="danger" class="mt-6">{{ $errors->first() }}</x-alert>
             @endif

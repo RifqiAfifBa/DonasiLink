@@ -92,6 +92,15 @@
                     <p id="sisaDanaHint" class="mt-1.5 text-xs text-brand-600 dark:text-brand-300"></p>
                 </x-form.group>
 
+                <x-form.group label="Kategori Pengeluaran" for="kategori_pengeluaran" required hint="Pilih kategori penggunaan dana untuk grafik distribusi.">
+                    <select id="kategori_pengeluaran" name="kategori_pengeluaran" required class="block w-full px-4 py-3 rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-900 text-sm focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-500">
+                        <option value="" disabled selected>Pilih Kategori</option>
+                        <option value="Medis">💊 Medis (Obat, Operasi, Perawatan)</option>
+                        <option value="Pakan">🍖 Pakan (Makanan, Snack, Suplemen)</option>
+                        <option value="Operasional">🔧 Operasional (Listrik, Sewa, Transport)</option>
+                    </select>
+                </x-form.group>
+
                 <x-form.group label="Tujuan Penarikan" for="keterangan" required hint="Jelaskan untuk apa dana ini akan digunakan.">
                     <textarea id="keterangan" name="keterangan" rows="3" required placeholder="Contoh: Untuk biaya operasi tumor pada Milo di klinik hewan ABC..."
                               class="block w-full px-4 py-3 rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-900 text-sm focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-500 resize-y"></textarea>

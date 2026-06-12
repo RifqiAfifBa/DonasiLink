@@ -19,9 +19,12 @@
     </div>
 </x-card>
 
-<script>
+    <script>
     document.addEventListener('DOMContentLoaded', function() {
         const ctx = document.getElementById('{{ $id }}').getContext('2d');
+        const isDark = document.documentElement.classList.contains('dark');
+        const textColor = isDark ? '#e2e8f0' : getComputedStyle(document.documentElement).getPropertyValue('--color-ink-900');
+        const gridColor = isDark ? '#334155' : getComputedStyle(document.documentElement).getPropertyValue('--color-ink-100');
 
         const defaultOptions = {
             responsive: true,
@@ -30,7 +33,7 @@
                 legend: {
                     position: 'top',
                     labels: {
-                        color: getComputedStyle(document.documentElement).getPropertyValue('--color-ink-900'),
+                        color: textColor,
                         font: {
                             size: 12,
                             weight: '600'
@@ -42,13 +45,19 @@
             scales: {
                 y: {
                     beginAtZero: true,
+                    ticks: {
+                        color: textColor
+                    },
                     grid: {
-                        color: getComputedStyle(document.documentElement).getPropertyValue('--color-ink-100'),
+                        color: gridColor,
                     }
                 },
                 x: {
+                    ticks: {
+                        color: textColor
+                    },
                     grid: {
-                        color: getComputedStyle(document.documentElement).getPropertyValue('--color-ink-100'),
+                        color: gridColor,
                     }
                 }
             }

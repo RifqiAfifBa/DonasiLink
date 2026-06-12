@@ -8,13 +8,22 @@ use App\Models\Admin;
 use App\Models\Foto;
 use Illuminate\Http\Request;
 use App\Services\NotificationService;
+use App\Services\ActivityLogger;
 
 class ShelterController extends Controller
 {
+    private function checkShelter()
+    {
+        if (!session('shelter_id')) {
+            return redirect()->route('login')->withErrors(['email' => 'Silakan login sebagai shelter terlebih dahulu.']);
+        }
+        return null;
+    }
+
     public function landingpage()
     {
-        // Sementara shelter_id diambil dari session, nanti setelah auth shelter aktif
-        $shelterId = session('shelter_id', 1);
+        if ($redirect = $this->checkShelter()) return $redirect;
+        $shelterId = session('shelter_id');
         $kampanye = Kampanye::where('shelter_id', $shelterId)->latest()->get();
 
         return view('shelter.landingpage', compact('kampanye'));
@@ -22,11 +31,14 @@ class ShelterController extends Controller
 
     public function formShelter()
     {
+        if ($redirect = $this->checkShelter()) return $redirect;
         return view('shelter.formShelter');
     }
 
     public function storeKampanye(Request $request)
     {
+        if ($redirect = $this->checkShelter()) return $redirect;
+
         $validated = $request->validate([
             'nama_hewan'      => 'required|string|max:100',
             'usia_hewan'      => 'required|string|max:50',
@@ -42,8 +54,8 @@ class ShelterController extends Controller
             $gambar = Foto::simpanDariUpload($request->file('image'), 'kampanye');
         }
 
-        Kampanye::create([
-            'shelter_id'      => session('shelter_id', 1),
+        $kampanye = Kampanye::create([
+            'shelter_id'      => session('shelter_id'),
             'nama_hewan'      => $validated['nama_hewan'],
             'usia_hewan'      => $validated['usia_hewan'],
             'sedang_sakit'    => $validated['sedang_sakit'],
@@ -53,12 +65,34 @@ class ShelterController extends Controller
             'gambar'          => $gambar,
         ]);
 
+        // Log activity
+        ActivityLogger::log(
+            'create_campaign',
+            "Membuat kampanye baru untuk '{$validated['nama_hewan']}' dengan target Rp " . number_format($validated['target_donasi'], 0, ',', '.'),
+            'kampanye',
+            $kampanye->id
+        );
+
+        // Notify all admins about new campaign
+        $shelter = \App\Models\Shelter::find(session('shelter_id'));
+        if ($shelter) {
+            NotificationService::notifyAllAdmins(
+                'kampanye_selesai',
+                'Kampanye Baru Dibuat',
+                "Shelter '{$shelter->nama_shelter}' telah membuat kampanye baru untuk '{$validated['nama_hewan']}' dengan target Rp " . number_format($validated['target_donasi'], 0, ',', '.') . ".",
+                'Kampanye',
+                null,
+                ['shelter_name' => $shelter->nama_shelter, 'target' => $validated['target_donasi']]
+            );
+        }
+
         return redirect()->route('shelter.landingpage')->with('success', 'Kampanye berhasil dipublikasikan!');
     }
 
     public function withdrawShelter()
     {
-        $shelterId = session('shelter_id', 1);
+        if ($redirect = $this->checkShelter()) return $redirect;
+        $shelterId = session('shelter_id');
         $kampanye = Kampanye::where('shelter_id', $shelterId)
             ->where('total_terkumpul', '>', 0)
             ->get()
@@ -77,11 +111,13 @@ class ShelterController extends Controller
 
     public function updateForm(Kampanye $kampanye)
     {
+        if ($redirect = $this->checkShelter()) return $redirect;
         return view('shelter.updateFormShelter', compact('kampanye'));
     }
 
     public function updateKampanye(Request $request, Kampanye $kampanye)
     {
+        if ($redirect = $this->checkShelter()) return $redirect;
         $validated = $request->validate([
             'nama_hewan'      => 'required|string|max:100',
             'usia_hewan'      => 'required|string|max:50',
@@ -107,12 +143,21 @@ class ShelterController extends Controller
 
         $kampanye->update($data);
 
+        // Log activity
+        ActivityLogger::log(
+            'update_campaign',
+            "Memperbarui kampanye '{$kampanye->nama_hewan}'",
+            'kampanye',
+            $kampanye->id
+        );
+
         return redirect()->route('shelter.landingpage')->with('success', 'Kampanye berhasil diperbarui.');
     }
 
     public function riwayatPenarikan()
     {
-        $shelterId = session('shelter_id', 1);
+        if ($redirect = $this->checkShelter()) return $redirect;
+        $shelterId = session('shelter_id');
         $riwayat = Penarikan::with('kampanye')
             ->where('shelter_id', $shelterId)
             ->orderBy('created_at', 'desc')
@@ -123,15 +168,20 @@ class ShelterController extends Controller
 
     public function storePenarikan(Request $request)
     {
-        $shelterId = session('shelter_id', 1);
+        if ($redirect = $this->checkShelter()) return $redirect;
+        $shelterId = session('shelter_id');
 
         $validated = $request->validate([
-            'kampanye_id'     => 'required|exists:kampanye,id',
-            'bank'            => 'required|string|max:50',
-            'nomor_rekening'  => 'required|string|max:50',
-            'nama_rekening'   => 'required|string|max:100',
-            'total_penarikan' => 'required|numeric|min:10000',
-            'keterangan'      => 'required|string',
+            'kampanye_id'           => 'required|exists:kampanye,id',
+            'bank'                  => 'required|string|max:50',
+            'nomor_rekening'        => 'required|string|max:50',
+            'nama_rekening'         => 'required|string|max:100',
+            'total_penarikan'       => 'required|numeric|min:10000',
+            'keterangan'            => 'required|string',
+            'kategori_pengeluaran'  => 'required|in:Medis,Pakan,Operasional',
+        ], [
+            'kategori_pengeluaran.required' => 'Pilih kategori pengeluaran.',
+            'kategori_pengeluaran.in'       => 'Kategori harus Medis, Pakan, atau Operasional.',
         ]);
 
         $kampanye = Kampanye::where('id', $validated['kampanye_id'])
@@ -152,15 +202,24 @@ class ShelterController extends Controller
         }
 
         $penarikan = Penarikan::create([
-            'shelter_id'      => $shelterId,
-            'kampanye_id'     => $kampanye->id,
-            'bank'            => $validated['bank'],
-            'nomor_rekening'  => $validated['nomor_rekening'],
-            'nama_rekening'   => $validated['nama_rekening'],
-            'total_penarikan' => $validated['total_penarikan'],
-            'keterangan'      => $validated['keterangan'],
-            'status'          => 'Diproses',
+            'shelter_id'            => $shelterId,
+            'kampanye_id'           => $kampanye->id,
+            'bank'                  => $validated['bank'],
+            'nomor_rekening'        => $validated['nomor_rekening'],
+            'nama_rekening'         => $validated['nama_rekening'],
+            'total_penarikan'       => $validated['total_penarikan'],
+            'keterangan'            => $validated['keterangan'],
+            'kategori_pengeluaran'  => $validated['kategori_pengeluaran'],
+            'status'                => 'Diproses',
         ]);
+
+        // Log activity
+        ActivityLogger::log(
+            'submit_withdrawal',
+            "Mengajukan penarikan dana untuk kampanye '{$kampanye->nama_hewan}' sebesar Rp " . number_format($penarikan->total_penarikan, 0, ',', '.'),
+            'penarikan',
+            $penarikan->id
+        );
 
         // Load relationships for notifications
         $penarikan->load(['shelter']);
@@ -180,7 +239,8 @@ class ShelterController extends Controller
 
     public function uploadBuktiForm(Penarikan $penarikan)
     {
-        $shelterId = session('shelter_id', 1);
+        if ($redirect = $this->checkShelter()) return $redirect;
+        $shelterId = session('shelter_id');
         if ($penarikan->shelter_id != $shelterId) {
             abort(403, 'Anda tidak memiliki akses ke penarikan ini.');
         }
@@ -195,7 +255,8 @@ class ShelterController extends Controller
 
     public function storeBukti(Request $request, Penarikan $penarikan)
     {
-        $shelterId = session('shelter_id', 1);
+        if ($redirect = $this->checkShelter()) return $redirect;
+        $shelterId = session('shelter_id');
         if ($penarikan->shelter_id != $shelterId) {
             abort(403);
         }
@@ -220,6 +281,14 @@ class ShelterController extends Controller
             'deskripsi_penggunaan' => $validated['deskripsi_penggunaan'],
             'tanggal_selesai'      => now(),
         ]);
+
+        // Log activity
+        ActivityLogger::log(
+            'upload_proof',
+            "Mengunggah bukti pengeluaran untuk penarikan dana kampanye '{$penarikan->kampanye->nama_hewan}' sebesar Rp " . number_format($penarikan->total_penarikan, 0, ',', '.'),
+            'penarikan',
+            $penarikan->id
+        );
 
         // Load relationships for notifications
         $penarikan->load(['kampanye', 'shelter']);

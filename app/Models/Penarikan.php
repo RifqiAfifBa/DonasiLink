@@ -16,12 +16,15 @@ class Penarikan extends Model
         'nama_rekening',
         'total_penarikan',
         'keterangan',
+        'kategori_pengeluaran',
         'bukti_pengeluaran',
         'deskripsi_penggunaan',
         'status',
         'tanggal_disetujui',
         'tanggal_selesai',
     ];
+
+    public static array $kategoriList = ['Medis', 'Pakan', 'Operasional'];
 
     protected $casts = [
         'tanggal_disetujui' => 'datetime',

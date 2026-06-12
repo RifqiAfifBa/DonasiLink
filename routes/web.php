@@ -59,10 +59,13 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/shelters', [AdminController::class, 'shelters'])->name('shelters');
     Route::get('/kampanye', [AdminController::class, 'kampanye'])->name('kampanye');
     Route::get('/donasi', [AdminController::class, 'donasi'])->name('donasi');
+    Route::post('/donasi/{donasi}/accept', [AdminController::class, 'acceptDonasi'])->name('donasi.accept');
+    Route::post('/donasi/{donasi}/reject', [AdminController::class, 'rejectDonasi'])->name('donasi.reject');
     Route::get('/penarikan', [AdminController::class, 'penarikan'])->name('penarikan');
     Route::post('/penarikan/{penarikan}/accept', [AdminController::class, 'acceptPenarikan'])->name('penarikan.accept');
     Route::post('/penarikan/{penarikan}/reject', [AdminController::class, 'rejectPenarikan'])->name('penarikan.reject');
     Route::get('/users', [AdminController::class, 'users'])->name('users');
+    Route::get('/activity-logs', [AdminController::class, 'activityLogs'])->name('activity-logs');
     Route::post('/users', [AdminController::class, 'storeUser'])->name('users.store');
     Route::post('/users/{type}/{id}/promote', [AdminController::class, 'promoteToAdmin'])->name('users.promote');
     Route::delete('/users/{type}/{id}', [AdminController::class, 'destroyUser'])->name('users.destroy');

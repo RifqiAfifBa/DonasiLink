@@ -70,6 +70,7 @@ class ChartHelper
     /**
      * Format fund distribution data for Campaign Detail
      * Returns pie chart data showing Medis/Pakan/Operasional/Saldo
+     * Uses kategori_pengeluaran column for accurate categorization.
      */
     public static function getCampaignFundDistribution($kampanye)
     {
@@ -77,22 +78,9 @@ class ChartHelper
             ->where('status', 'Berhasil')
             ->get();
 
-        // Group by category (from keterangan field or deskripsi_penggunaan)
-        $medis = 0;
-        $pakan = 0;
-        $operasional = 0;
-
-        foreach ($penarikan as $p) {
-            $desc = strtolower($p->deskripsi_penggunaan ?? $p->keterangan ?? '');
-
-            if (strpos($desc, 'medis') !== false || strpos($desc, 'obat') !== false) {
-                $medis += $p->total_penarikan;
-            } elseif (strpos($desc, 'pakan') !== false || strpos($desc, 'makanan') !== false) {
-                $pakan += $p->total_penarikan;
-            } else {
-                $operasional += $p->total_penarikan;
-            }
-        }
+        $medis = $penarikan->where('kategori_pengeluaran', 'Medis')->sum('total_penarikan');
+        $pakan = $penarikan->where('kategori_pengeluaran', 'Pakan')->sum('total_penarikan');
+        $operasional = $penarikan->where('kategori_pengeluaran', 'Operasional')->sum('total_penarikan');
 
         $totalDisalurkan = $medis + $pakan + $operasional;
         $saldo = max(0, $kampanye->total_terkumpul - $totalDisalurkan);

@@ -7,12 +7,18 @@ use App\Models\Kampanye;
 use App\Models\Admin;
 use App\Models\Donatur;
 use App\Services\NotificationService;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
 class CheckoutController extends Controller
 {
     public function show(Kampanye $kampanye)
     {
+        if (session('role') !== 'donatur') {
+            session()->put('intended_url', url()->current());
+            return redirect()->route('login')->with('info', 'Silakan masuk terlebih dahulu untuk melanjutkan donasi.');
+        }
+
         return view('checkout', compact('kampanye'));
     }
 
@@ -39,6 +45,14 @@ class CheckoutController extends Controller
 
         $kampanye->increment('total_terkumpul', $validated['jumlah']);
 
+        // Log activity
+        ActivityLogger::log(
+            'donate',
+            "Donasi sebesar Rp " . number_format($validated['jumlah'], 0, ',', '.') . " untuk kampanye '{$kampanye->nama_hewan}' dari {$validated['donor_name']}",
+            'donasi',
+            $donasi->id
+        );
+
         // Create notification for registered donor if exists
         if ($donasi->donatur_id) {
             $donatur = Donatur::find($donasi->donatur_id);
@@ -63,6 +77,28 @@ class CheckoutController extends Controller
             'Donasi',
             $donasi->id
         );
+
+        // Notify if campaign just reached its target
+        if ($kampanye->total_terkumpul >= $kampanye->target_donasi) {
+            $kampanye->load('shelter');
+            NotificationService::notifyShelter(
+                $kampanye->shelter,
+                'kampanye_selesai',
+                'Kampanye Tercapai!',
+                "Kampanye '{$kampanye->nama_hewan}' telah mencapai target donasi sebesar Rp " . number_format($kampanye->target_donasi, 0, ',', '.') . ". Dana siap untuk dicairkan.",
+                'Kampanye',
+                $kampanye->id,
+                ['target' => $kampanye->target_donasi, 'total_terkumpul' => $kampanye->total_terkumpul]
+            );
+
+            NotificationService::notifyAllAdmins(
+                'kampanye_selesai',
+                'Kampanye Mencapai Target',
+                "Kampanye '{$kampanye->nama_hewan}' oleh {$kampanye->shelter->nama_shelter} telah mencapai target donasi Rp " . number_format($kampanye->target_donasi, 0, ',', '.') . ".",
+                'Kampanye',
+                $kampanye->id
+            );
+        }
 
         return redirect()->route('kampanye.show', $kampanye->id)->with('donation_success', [
             'nama_hewan'  => $kampanye->nama_hewan,

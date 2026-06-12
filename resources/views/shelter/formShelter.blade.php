@@ -93,11 +93,23 @@
                 <p class="text-[11px] font-bold uppercase tracking-widest text-brand-600 dark:text-brand-300 mb-3 pb-2 border-b border-ink-100 dark:border-ink-700"><i class="fas fa-bullseye mr-2"></i>Target Donasi</p>
                 <x-form.group label="Jumlah Target" for="target_donasi" required hint="Masukkan jumlah dana yang dibutuhkan.">
                     <div class="relative">
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-ink-500 dark:text-ink-400 font-semibold text-sm">Rp</span>
-                        <input type="number" id="target_donasi" name="target_donasi" min="10000" required
-                               value="{{ old('target_donasi') }}" placeholder="500000"
-                               class="block w-full pl-12 pr-4 py-3 rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-900 text-sm focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-500">
+                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-ink-500 dark:text-ink-400 font-semibold text-sm z-10">Rp</span>
+                        <input type="number" id="target_donasi" name="target_donasi" min="100000" step="10000" required
+                               value="{{ old('target_donasi', 100000) }}"
+                               oninput="validateTarget()"
+                               class="block w-full pl-12 pr-14 py-3 rounded-xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-900 text-sm focus:outline-none focus:ring-4 focus:ring-brand-100 focus:border-brand-500 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none">
+                        <div class="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col">
+                            <button type="button" onclick="stepper(10000)"
+                                    class="px-3 py-0.5 rounded-t-lg hover:bg-ink-100 dark:hover:bg-ink-700 text-ink-500 dark:text-ink-400 transition-colors leading-none">
+                                <i class="fas fa-chevron-up text-xs"></i>
+                            </button>
+                            <button type="button" onclick="stepper(-10000)"
+                                    class="px-3 py-0.5 rounded-b-lg hover:bg-ink-100 dark:hover:bg-ink-700 text-ink-500 dark:text-ink-400 transition-colors leading-none">
+                                <i class="fas fa-chevron-down text-xs"></i>
+                            </button>
+                        </div>
                     </div>
+                    <p id="targetWarning" class="mt-1.5 text-xs text-rose-600 dark:text-rose-400 hidden"><i class="fas fa-exclamation-circle mr-1"></i>Tidak bisa kurang dari 100.000</p>
                 </x-form.group>
             </section>
 
@@ -127,9 +139,36 @@ function previewImg(input) {
     reader.readAsDataURL(file);
 }
 
+function validateTarget() {
+    const input = document.getElementById('target_donasi');
+    const warning = document.getElementById('targetWarning');
+    const min = parseInt(input.min, 10) || 100000;
+    const val = parseInt(input.value, 10) || 0;
+    if (val < min) {
+        warning.classList.remove('hidden');
+    } else {
+        warning.classList.add('hidden');
+    }
+}
+
+function stepper(delta) {
+    const input = document.getElementById('target_donasi');
+    const min = parseInt(input.min, 10) || 100000;
+    const step = parseInt(input.step, 10) || 10000;
+    let val = parseInt(input.value.replace(/\D/g, ''), 10) || 0;
+    val = Math.round(val / step) * step;
+    val += delta;
+    if (val < min) val = min;
+    input.value = val;
+    validateTarget();
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const ta = document.getElementById('deskripsi_hewan');
     if (ta) document.getElementById('charCount').textContent = ta.value.length;
+
+    validateTarget();
 
     const zone = document.getElementById('uploadZone');
     zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('border-brand-500'); });
@@ -141,6 +180,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (file && file.type.startsWith('image/')) {
             document.getElementById('imageInput').files = e.dataTransfer.files;
             previewImg({ files: e.dataTransfer.files });
+        }
+    });
+
+    document.getElementById('campForm').addEventListener('submit', (e) => {
+        validateTarget();
+        const warning = document.getElementById('targetWarning');
+        if (!warning.classList.contains('hidden')) {
+            e.preventDefault();
+            document.getElementById('target_donasi').focus();
         }
     });
 });

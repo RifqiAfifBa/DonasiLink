@@ -33,7 +33,7 @@
 
         <!-- Footer -->
         <div class="px-5 py-3 border-t border-ink-100 dark:border-ink-800 bg-ink-50 dark:bg-ink-800/50">
-            <a href="#" class="text-xs font-semibold text-brand-600 dark:text-brand-300 hover:underline">
+            <a href="{{ route('notifications.index') }}" class="text-xs font-semibold text-brand-600 dark:text-brand-300 hover:underline">
                 Lihat semua notifikasi →
             </a>
         </div>

@@ -10,8 +10,10 @@ use App\Models\Donatur;
 use App\Models\Kampanye;
 use App\Models\Donasi;
 use App\Models\Penarikan;
+use App\Models\ActivityLog;
 use App\Helpers\ChartHelper;
 use App\Services\NotificationService;
+use App\Services\ActivityLogger;
 
 class AdminController extends Controller
 {
@@ -65,6 +67,83 @@ class AdminController extends Controller
         ]);
     }
 
+    public function acceptDonasi(Donasi $donasi)
+    {
+        if (!$this->checkAdmin()) return redirect()->route('login');
+
+        $donasi->update(['status' => 'berhasil']);
+
+        // Notify shelter
+        $kampanye = $donasi->kampanye;
+        NotificationService::notifyShelter(
+            $kampanye->shelter,
+            'donasi_disetujui',
+            'Donasi Disetujui',
+            "Donasi sebesar Rp " . number_format($donasi->jumlah, 0, ',', '.') . " untuk kampanye '{$kampanye->nama_hewan}' telah disetujui. Dana dapat diajukan penarikan.",
+            'Donasi',
+            $donasi->id,
+            ['kampanye_id' => $kampanye->id, 'jumlah' => $donasi->jumlah]
+        );
+
+        // Notify donatur if exists
+        if ($donasi->donatur_id) {
+            $donatur = Donatur::find($donasi->donatur_id);
+            if ($donatur) {
+                NotificationService::notifyDonatur(
+                    $donatur,
+                    'donasi_disetujui',
+                    'Donasi Disetujui',
+                    "Donasi Anda sebesar Rp " . number_format($donasi->jumlah, 0, ',', '.') . " untuk kampanye '{$kampanye->nama_hewan}' telah disetujui oleh admin.",
+                    'Donasi',
+                    $donasi->id,
+                    ['kampanye_id' => $kampanye->id, 'jumlah' => $donasi->jumlah]
+                );
+            }
+        }
+
+        return redirect()->back()->with('success', 'Donasi berhasil disetujui.');
+    }
+
+    public function rejectDonasi(Donasi $donasi)
+    {
+        if (!$this->checkAdmin()) return redirect()->route('login');
+
+        $donasi->update(['status' => 'gagal']);
+
+        // Decrement total_terkumpul
+        $kampanye = $donasi->kampanye;
+        $kampanye->decrement('total_terkumpul', $donasi->jumlah);
+
+        // Notify shelter
+        NotificationService::notifyShelter(
+            $kampanye->shelter,
+            'donasi_ditolak',
+            'Donasi Ditolak',
+            "Dana Di Tolak Oleh Admin, Silahkan hubungi Admin.",
+            'Donasi',
+            $donasi->id,
+            ['kampanye_id' => $kampanye->id, 'jumlah' => $donasi->jumlah]
+        );
+
+        // Notify donatur if exists
+        if ($donasi->donatur_id) {
+            $donatur = Donatur::find($donasi->donatur_id);
+            if ($donatur) {
+                NotificationService::notifyDonatur(
+                    $donatur,
+                    'donasi_ditolak',
+                    'Donasi Ditolak',
+                    "Maaf Donasi di Tolak Oleh Admin! Uang Anda Akan Segera Kembali!",
+                    'Donasi',
+                    $donasi->id,
+                    ['kampanye_id' => $kampanye->id, 'jumlah' => $donasi->jumlah]
+                );
+            }
+        }
+
+        return redirect()->back()->with('success', 'Donasi ditolak.');
+    }
+
     public function penarikan()
     {
         if (!$this->checkAdmin()) return redirect()->route('login');
@@ -86,6 +165,14 @@ class AdminController extends Controller
             'status'            => 'Berhasil',
             'tanggal_disetujui' => $penarikan->tanggal_disetujui ?? now(),
         ]);
+
+        // Log activity
+        ActivityLogger::log(
+            'approve_withdrawal',
+            "Menyetujui penarikan dana untuk kampanye '{$penarikan->kampanye->nama_hewan}' sebesar Rp " . number_format($penarikan->total_penarikan, 0, ',', '.'),
+            'penarikan',
+            $penarikan->id
+        );
 
         // Create notifications
         $shelter = $penarikan->shelter;
@@ -119,6 +206,14 @@ class AdminController extends Controller
         if (!$this->checkAdmin()) return redirect()->route('login');
 
         $penarikan->update(['status' => 'Gagal']);
+
+        // Log activity
+        ActivityLogger::log(
+            'reject_withdrawal',
+            "Menolak penarikan dana untuk kampanye '{$penarikan->kampanye->nama_hewan}' sebesar Rp " . number_format($penarikan->total_penarikan, 0, ',', '.'),
+            'penarikan',
+            $penarikan->id
+        );
 
         // Create notifications
         $shelter = $penarikan->shelter;
@@ -179,6 +274,7 @@ class AdminController extends Controller
                 'username' => $data['username'],
                 'password' => Hash::make($data['password']),
             ]);
+            ActivityLogger::log('create_user', "Membuat admin baru '{$data['username']}'", 'admin', null);
             $msg = "Admin {$data['username']} berhasil dibuat.";
         } elseif ($role === 'shelter') {
             $data = $request->validate([
@@ -189,12 +285,13 @@ class AdminController extends Controller
             ], [
                 'username.unique' => 'Username shelter sudah digunakan.',
             ]);
-            Shelter::create([
+            $shelter = Shelter::create([
                 'nama_shelter' => $data['nama_shelter'],
                 'lokasi'       => $data['lokasi'],
                 'username'     => $data['username'],
                 'password'     => Hash::make($data['password']),
             ]);
+            ActivityLogger::log('create_user', "Membuat shelter baru '{$data['nama_shelter']}'", 'shelter', $shelter->id);
             $msg = "Shelter {$data['nama_shelter']} berhasil dibuat.";
         } elseif ($role === 'donatur') {
             $data = $request->validate([
@@ -206,12 +303,13 @@ class AdminController extends Controller
                 'username.unique' => 'Username donatur sudah digunakan.',
                 'email.unique'    => 'Email sudah terdaftar.',
             ]);
-            Donatur::create([
+            $donatur = Donatur::create([
                 'username'   => $data['username'],
                 'email'      => $data['email'],
                 'no_telepon' => $data['no_telepon'] ?? null,
                 'password'   => Hash::make($data['password']),
             ]);
+            ActivityLogger::log('create_user', "Membuat donatur baru '{$data['username']}'", 'donatur', $donatur->id);
             $msg = "Donatur {$data['username']} berhasil dibuat.";
         } else {
             return back()->withErrors(['role' => 'Role tidak valid.']);
@@ -239,6 +337,8 @@ class AdminController extends Controller
             'password' => $user->password,
         ]);
 
+        ActivityLogger::log('promote_user', "Mempromosikan {$type} '{$user->username}' menjadi admin", $type, $id);
+
         return redirect()->route('admin.users')->with('success', "Akun {$user->username} sekarang memiliki akses admin.");
     }
 
@@ -255,13 +355,16 @@ class AdminController extends Controller
                 return back()->with('error', 'Tidak dapat menghapus admin terakhir.');
             }
             $admin->delete();
+            ActivityLogger::log('delete_user', "Menghapus admin '{$admin->username}'", 'admin', $id);
             $msg = "Admin {$admin->username} dihapus.";
         } elseif ($type === 'shelter') {
             $s = Shelter::findOrFail($id);
+            ActivityLogger::log('delete_user', "Menghapus shelter '{$s->nama_shelter}'", 'shelter', $id);
             $s->delete();
             $msg = "Shelter {$s->nama_shelter} dihapus.";
         } elseif ($type === 'donatur') {
             $d = Donatur::findOrFail($id);
+            ActivityLogger::log('delete_user', "Menghapus donatur '{$d->username}'", 'donatur', $id);
             $d->delete();
             $msg = "Donatur {$d->username} dihapus.";
         } else {
@@ -269,5 +372,14 @@ class AdminController extends Controller
         }
 
         return redirect()->route('admin.users')->with('success', $msg);
+    }
+
+    public function activityLogs()
+    {
+        if (!$this->checkAdmin()) return redirect()->route('login');
+
+        $logs = ActivityLog::latest()->paginate(50);
+
+        return view('admin.activity-logs', compact('logs'));
     }
 }

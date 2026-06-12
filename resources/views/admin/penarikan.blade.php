@@ -17,6 +17,7 @@
                     <tr class="border-b border-ink-200 dark:border-ink-700">
                         <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Tanggal</th>
                         <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Shelter & Kampanye</th>
+                        <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Kategori</th>
                         <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Rekening & Tujuan</th>
                         <th class="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Nominal</th>
                         <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Status</th>
@@ -39,6 +40,20 @@
                             <td class="px-6 py-5">
                                 <p class="font-semibold text-ink-900 dark:text-white">{{ $item->shelter ? $item->shelter->nama_shelter : 'Shelter #'.$item->shelter_id }}</p>
                                 <p class="text-xs text-brand-600 dark:text-brand-300 mt-0.5"><i class="fas fa-paw mr-1"></i>{{ $item->kampanye->nama_hewan ?? '—' }}</p>
+                            </td>
+                            <td class="px-6 py-5">
+                                @if($item->kategori_pengeluaran)
+                                    @php $cat = $item->kategori_pengeluaran; @endphp
+                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap
+                                        {{ $cat === 'Medis' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300' : '' }}
+                                        {{ $cat === 'Pakan' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' : '' }}
+                                        {{ $cat === 'Operasional' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : '' }}">
+                                        {{ $cat === 'Medis' ? '💊' : '' }}{{ $cat === 'Pakan' ? '🍖' : '' }}{{ $cat === 'Operasional' ? '🔧' : '' }}
+                                        {{ $cat }}
+                                    </span>
+                                @else
+                                    <span class="text-xs text-ink-400 italic">—</span>
+                                @endif
                             </td>
                             <td class="px-6 py-5 max-w-md">
                                 <p class="font-semibold text-ink-900 dark:text-white">{{ $item->bank }} &middot; {{ $item->nomor_rekening }}</p>
