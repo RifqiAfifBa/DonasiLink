@@ -154,6 +154,28 @@ class ShelterController extends Controller
         return redirect()->route('shelter.landingpage')->with('success', 'Kampanye berhasil diperbarui.');
     }
 
+    public function destroyKampanye(Kampanye $kampanye)
+    {
+        if ($redirect = $this->checkShelter()) return $redirect;
+
+        if ($kampanye->shelter_id != session('shelter_id')) {
+            abort(403, 'Anda tidak memiliki akses untuk menghapus kampanye ini.');
+        }
+
+        $namaHewan = $kampanye->nama_hewan;
+        $kampanye->delete();
+
+        ActivityLogger::log(
+            'delete_campaign',
+            "Menghapus kampanye '{$namaHewan}'",
+            'kampanye',
+            $kampanye->id
+        );
+
+        return redirect()->route('shelter.landingpage')
+            ->with('success', "Kampanye '{$namaHewan}' berhasil dihapus.");
+    }
+
     public function riwayatPenarikan()
     {
         if ($redirect = $this->checkShelter()) return $redirect;

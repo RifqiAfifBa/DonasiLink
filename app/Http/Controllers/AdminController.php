@@ -58,6 +58,24 @@ class AdminController extends Controller
         ]);
     }
 
+    public function destroyKampanye(Kampanye $kampanye)
+    {
+        if (!$this->checkAdmin()) return redirect()->route('login');
+
+        $namaHewan = $kampanye->nama_hewan;
+        $kampanye->delete();
+
+        ActivityLogger::log(
+            'delete_campaign',
+            "Admin menghapus kampanye '{$namaHewan}'",
+            'kampanye',
+            $kampanye->id
+        );
+
+        return redirect()->route('admin.kampanye')
+            ->with('success', "Kampanye '{$namaHewan}' berhasil dihapus.");
+    }
+
     public function donasi()
     {
         if (!$this->checkAdmin()) return redirect()->route('login');

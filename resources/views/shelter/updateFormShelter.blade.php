@@ -115,6 +115,23 @@
             </div>
         </form>
     </x-card>
+
+    <x-card padding="p-7 sm:p-10" class="mt-8 border-2 border-rose-200 dark:border-rose-900/50">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-rose-100 dark:bg-rose-900/40 flex items-center justify-center text-rose-600 dark:text-rose-300 text-xl shrink-0">
+                <i class="fas fa-trash-can"></i>
+            </div>
+            <div class="flex-1 min-w-0">
+                <h2 class="text-lg font-bold text-ink-900 dark:text-white">Hapus Kampanye</h2>
+                <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">Setelah dihapus, semua data kampanye dan donasi terkait akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.</p>
+                <form action="{{ route('shelter.deleteKampanye', $kampanye->id) }}" method="POST" class="mt-4" onsubmit="return confirm('Yakin ingin menghapus kampanye &quot;{{ $kampanye->nama_hewan }}&quot;? Semua data donasi terkait akan ikut terhapus. Tindakan ini tidak dapat dibatalkan.')">
+                    @csrf
+                    @method('DELETE')
+                    <x-button type="submit" variant="danger" size="lg" icon="trash-can">Hapus Kampanye</x-button>
+                </form>
+            </div>
+        </div>
+    </x-card>
 </section>
 
 @push('scripts')

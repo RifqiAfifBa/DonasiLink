@@ -16,6 +16,7 @@
                     <th class="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Target</th>
                     <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Progress</th>
                     <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400">Status</th>
+                    <th class="px-6 py-4 text-center text-xs font-bold uppercase tracking-wider text-ink-500 dark:text-ink-400 w-20">Aksi</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-ink-100 dark:divide-ink-700">
@@ -41,6 +42,12 @@
                             <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">Rp {{ number_format($item->total_terkumpul, 0, ',', '.') }}</p>
                         </td>
                         <td class="px-6 py-4 text-center"><x-badge :type="$tone">{{ ucfirst($item->status) }}</x-badge></td>
+                        <td class="px-6 py-4 text-center">
+                            <form action="{{ route('admin.kampanye.destroy', $item->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus kampanye &quot;{{ $item->nama_hewan }}&quot;? Semua data donasi terkait akan ikut terhapus. Tindakan ini tidak dapat dibatalkan.')">
+                                @csrf @method('DELETE')
+                                <x-button type="submit" variant="danger" size="sm" icon="trash-can">Hapus</x-button>
+                            </form>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

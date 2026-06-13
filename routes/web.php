@@ -46,6 +46,7 @@ Route::prefix('shelter')->name('shelter.')->group(function () {
     Route::post('/kampanye', [ShelterController::class, 'storeKampanye'])->name('storeKampanye');
     Route::get('/kampanye/{kampanye}/edit', [ShelterController::class, 'updateForm'])->name('updateForm');
     Route::put('/kampanye/{kampanye}', [ShelterController::class, 'updateKampanye'])->name('updateKampanye');
+    Route::delete('/kampanye/{kampanye}', [ShelterController::class, 'destroyKampanye'])->name('deleteKampanye');
     Route::get('/withdraw', [ShelterController::class, 'withdrawShelter'])->name('withdraw');
     Route::post('/withdraw', [ShelterController::class, 'storePenarikan'])->name('storePenarikan');
     Route::get('/riwayat', [ShelterController::class, 'riwayatPenarikan'])->name('uploadStruk');
@@ -58,6 +59,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/shelters', [AdminController::class, 'shelters'])->name('shelters');
     Route::get('/kampanye', [AdminController::class, 'kampanye'])->name('kampanye');
+    Route::delete('/kampanye/{kampanye}', [AdminController::class, 'destroyKampanye'])->name('kampanye.destroy');
     Route::get('/donasi', [AdminController::class, 'donasi'])->name('donasi');
     Route::post('/donasi/{donasi}/accept', [AdminController::class, 'acceptDonasi'])->name('donasi.accept');
     Route::post('/donasi/{donasi}/reject', [AdminController::class, 'rejectDonasi'])->name('donasi.reject');
