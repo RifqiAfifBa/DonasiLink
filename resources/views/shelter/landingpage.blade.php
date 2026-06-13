@@ -52,6 +52,17 @@
                                 <x-button :href="route('shelter.updateForm', $item->id)" variant="secondary" size="sm" icon="edit">Edit</x-button>
                                 <x-button :href="route('kampanye.show', $item->id)" variant="dark" size="sm" icon="eye">Lihat</x-button>
                             </div>
+                            <div class="mt-2">
+                                <x-button :href="route('shelter.perkembangan.index', $item->id)" variant="ghost" size="sm" icon="stethoscope" class="w-full justify-center text-teal-600 dark:text-teal-400 border border-teal-200 dark:border-teal-800 hover:bg-teal-50 dark:hover:bg-teal-900/20">
+                                    Update Perkembangan
+                                    @php
+                                        $jumlahUpdate = \App\Models\PerkembanganHewan::where('kampanye_id', $item->id)->count();
+                                    @endphp
+                                    @if($jumlahUpdate > 0)
+                                        <span class="ml-1 px-1.5 py-0.5 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-[10px] font-bold">{{ $jumlahUpdate }}</span>
+                                    @endif
+                                </x-button>
+                            </div>
                         </div>
                     </article>
                 @endforeach

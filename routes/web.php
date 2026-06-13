@@ -52,6 +52,14 @@ Route::prefix('shelter')->name('shelter.')->group(function () {
     Route::get('/riwayat', [ShelterController::class, 'riwayatPenarikan'])->name('uploadStruk');
     Route::get('/penarikan/{penarikan}/bukti', [ShelterController::class, 'uploadBuktiForm'])->name('bukti.form');
     Route::post('/penarikan/{penarikan}/bukti', [ShelterController::class, 'storeBukti'])->name('bukti.store');
+
+    // Perkembangan Hewan
+    Route::get('/kampanye/{kampanye}/perkembangan', [ShelterController::class, 'perkembanganIndex'])->name('perkembangan.index');
+    Route::get('/kampanye/{kampanye}/perkembangan/create', [ShelterController::class, 'perkembanganCreate'])->name('perkembangan.create');
+    Route::post('/kampanye/{kampanye}/perkembangan', [ShelterController::class, 'perkembanganStore'])->name('perkembangan.store');
+    Route::get('/kampanye/{kampanye}/perkembangan/{perkembangan}/edit', [ShelterController::class, 'perkembanganEdit'])->name('perkembangan.edit');
+    Route::put('/kampanye/{kampanye}/perkembangan/{perkembangan}', [ShelterController::class, 'perkembanganUpdate'])->name('perkembangan.update');
+    Route::delete('/kampanye/{kampanye}/perkembangan/{perkembangan}', [ShelterController::class, 'perkembanganDestroy'])->name('perkembangan.destroy');
 });
 
 // Admin Routes

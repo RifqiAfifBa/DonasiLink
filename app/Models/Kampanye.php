@@ -32,6 +32,11 @@ class Kampanye extends Model
         return $this->hasMany(Penarikan::class);
     }
 
+    public function perkembangan()
+    {
+        return $this->hasMany(PerkembanganHewan::class)->orderBy('tanggal_update', 'desc')->orderBy('created_at', 'desc');
+    }
+
     public function persentase(): int
     {
         if ($this->target_donasi <= 0) return 0;

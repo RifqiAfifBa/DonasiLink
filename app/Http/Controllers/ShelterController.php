@@ -6,6 +6,7 @@ use App\Models\Kampanye;
 use App\Models\Penarikan;
 use App\Models\Admin;
 use App\Models\Foto;
+use App\Models\PerkembanganHewan;
 use Illuminate\Http\Request;
 use App\Services\NotificationService;
 use App\Services\ActivityLogger;
@@ -335,4 +336,190 @@ class ShelterController extends Controller
         return redirect()->route('shelter.uploadStruk')
             ->with('success', 'Bukti pengeluaran berhasil diunggah. Donatur sekarang dapat melihat transparansi dana ini.');
     }
+
+    // ======================================================
+    // PERKEMBANGAN HEWAN
+    // ======================================================
+
+
+    /**
+     * Tampilkan daftar semua update perkembangan untuk satu kampanye
+     */
+    public function perkembanganIndex(Kampanye $kampanye)
+    {
+        if ($redirect = $this->checkShelter()) return $redirect;
+        if ($kampanye->shelter_id != session('shelter_id')) abort(403);
+
+        $perkembangan = PerkembanganHewan::where('kampanye_id', $kampanye->id)
+            ->orderBy('tanggal_update', 'desc')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('shelter.perkembangan.index', compact('kampanye', 'perkembangan'));
+    }
+
+    /**
+     * Form tambah update perkembangan baru
+     */
+    public function perkembanganCreate(Kampanye $kampanye)
+    {
+        if ($redirect = $this->checkShelter()) return $redirect;
+        if ($kampanye->shelter_id != session('shelter_id')) abort(403);
+
+        return view('shelter.perkembangan.create', compact('kampanye'));
+    }
+
+    /**
+     * Simpan update perkembangan baru ke database
+     */
+    public function perkembanganStore(Request $request, Kampanye $kampanye)
+    {
+        if ($redirect = $this->checkShelter()) return $redirect;
+        if ($kampanye->shelter_id != session('shelter_id')) abort(403);
+
+        $validated = $request->validate([
+            'judul'          => 'required|string|max:200',
+            'catatan'        => 'required|string|max:3000',
+            'jenis'          => 'required|in:medis,pakan,perawatan,umum',
+            'kondisi'        => 'nullable|in:membaik,stabil,kritis,sembuh',
+            'tanggal_update' => 'required|date|before_or_equal:today',
+            'foto_sebelum'   => 'nullable|image|max:4096',
+            'foto_sesudah'   => 'nullable|image|max:4096',
+        ], [
+            'judul.required'          => 'Judul update wajib diisi.',
+            'catatan.required'        => 'Catatan perkembangan wajib diisi.',
+            'jenis.required'          => 'Pilih jenis update.',
+            'tanggal_update.required' => 'Tanggal update wajib diisi.',
+            'tanggal_update.before_or_equal' => 'Tanggal tidak boleh lebih dari hari ini.',
+            'foto_sebelum.max'        => 'Foto sebelum maksimal 4 MB.',
+            'foto_sesudah.max'        => 'Foto sesudah maksimal 4 MB.',
+        ]);
+
+        $fotoSebelum = null;
+        $fotoSesudah = null;
+
+        if ($request->hasFile('foto_sebelum')) {
+            $fotoSebelum = Foto::simpanDariUpload($request->file('foto_sebelum'), 'perkembangan');
+        }
+        if ($request->hasFile('foto_sesudah')) {
+            $fotoSesudah = Foto::simpanDariUpload($request->file('foto_sesudah'), 'perkembangan');
+        }
+
+        $perkembangan = PerkembanganHewan::create([
+            'kampanye_id'    => $kampanye->id,
+            'judul'          => $validated['judul'],
+            'catatan'        => $validated['catatan'],
+            'jenis'          => $validated['jenis'],
+            'kondisi'        => $validated['kondisi'] ?? null,
+            'tanggal_update' => $validated['tanggal_update'],
+            'nama_dokter'    => null,
+            'nama_klinik'    => null,
+            'foto_sebelum'   => $fotoSebelum,
+            'foto_sesudah'   => $fotoSesudah,
+        ]);
+
+        ActivityLogger::log(
+            'post_animal_update',
+            "Memposting update perkembangan '{$validated['judul']}' untuk hewan '{$kampanye->nama_hewan}'",
+            'perkembangan_hewan',
+            $perkembangan->id
+        );
+
+        // Notify para donatur yang sudah berdonasi ke kampanye ini
+        $shelter = \App\Models\Shelter::find(session('shelter_id'));
+        NotificationService::notifyDonorsOfImpact(
+            $kampanye->id,
+            "Update: {$kampanye->nama_hewan}",
+            "Shelter '{$shelter->nama_shelter}' memposting update baru: \"{$validated['judul']}\". Pantau perkembangan hewan di halaman kampanye.",
+            ['kampanye_id' => $kampanye->id, 'perkembangan_id' => $perkembangan->id]
+        );
+
+        return redirect()->route('shelter.perkembangan.index', $kampanye->id)
+            ->with('success', 'Update perkembangan berhasil diposting. Donatur akan mendapat notifikasi.');
+    }
+
+    /**
+     * Form edit perkembangan
+     */
+    public function perkembanganEdit(Kampanye $kampanye, PerkembanganHewan $perkembangan)
+    {
+        if ($redirect = $this->checkShelter()) return $redirect;
+        if ($kampanye->shelter_id != session('shelter_id')) abort(403);
+        if ($perkembangan->kampanye_id != $kampanye->id) abort(404);
+
+        return view('shelter.perkembangan.edit', compact('kampanye', 'perkembangan'));
+    }
+
+    /**
+     * Simpan perubahan edit perkembangan
+     */
+    public function perkembanganUpdate(Request $request, Kampanye $kampanye, PerkembanganHewan $perkembangan)
+    {
+        if ($redirect = $this->checkShelter()) return $redirect;
+        if ($kampanye->shelter_id != session('shelter_id')) abort(403);
+        if ($perkembangan->kampanye_id != $kampanye->id) abort(404);
+
+        $validated = $request->validate([
+            'judul'          => 'required|string|max:200',
+            'catatan'        => 'required|string|max:3000',
+            'jenis'          => 'required|in:medis,pakan,perawatan,umum',
+            'kondisi'        => 'nullable|in:membaik,stabil,kritis,sembuh',
+            'tanggal_update' => 'required|date|before_or_equal:today',
+            'foto_sebelum'   => 'nullable|image|max:4096',
+            'foto_sesudah'   => 'nullable|image|max:4096',
+        ]);
+
+        $data = [
+            'judul'          => $validated['judul'],
+            'catatan'        => $validated['catatan'],
+            'jenis'          => $validated['jenis'],
+            'kondisi'        => $validated['kondisi'] ?? null,
+            'tanggal_update' => $validated['tanggal_update'],
+            'nama_dokter'    => null,
+            'nama_klinik'    => null,
+        ];
+
+        if ($request->hasFile('foto_sebelum')) {
+            $data['foto_sebelum'] = Foto::simpanDariUpload($request->file('foto_sebelum'), 'perkembangan');
+        }
+        if ($request->hasFile('foto_sesudah')) {
+            $data['foto_sesudah'] = Foto::simpanDariUpload($request->file('foto_sesudah'), 'perkembangan');
+        }
+
+        $perkembangan->update($data);
+
+        ActivityLogger::log(
+            'edit_animal_update',
+            "Mengedit update perkembangan '{$validated['judul']}' untuk hewan '{$kampanye->nama_hewan}'",
+            'perkembangan_hewan',
+            $perkembangan->id
+        );
+
+        return redirect()->route('shelter.perkembangan.index', $kampanye->id)
+            ->with('success', 'Update perkembangan berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus satu entry perkembangan
+     */
+    public function perkembanganDestroy(Kampanye $kampanye, PerkembanganHewan $perkembangan)
+    {
+        if ($redirect = $this->checkShelter()) return $redirect;
+        if ($kampanye->shelter_id != session('shelter_id')) abort(403);
+        if ($perkembangan->kampanye_id != $kampanye->id) abort(404);
+
+        $judul = $perkembangan->judul;
+        $perkembangan->delete();
+
+        ActivityLogger::log(
+            'delete_animal_update',
+            "Menghapus update perkembangan '{$judul}' untuk hewan '{$kampanye->nama_hewan}'",
+            'perkembangan_hewan',
+            $perkembangan->id
+        );
+
+        return redirect()->route('shelter.perkembangan.index', $kampanye->id)
+            ->with('success', "Update perkembangan '{$judul}' berhasil dihapus.");
+    }
 }
+

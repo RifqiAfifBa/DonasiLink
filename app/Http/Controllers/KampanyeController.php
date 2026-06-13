@@ -21,7 +21,7 @@ class KampanyeController extends Controller
     {
         $kampanye->load(['shelter', 'penarikan' => function ($q) {
             $q->where('status', 'Berhasil')->orderBy('tanggal_disetujui', 'desc');
-        }]);
+        }, 'perkembangan']);
 
         $totalDisetujui = $kampanye->penarikan->sum('total_penarikan');
         $totalTerpakai  = $kampanye->penarikan->whereNotNull('bukti_pengeluaran')->sum('total_penarikan');

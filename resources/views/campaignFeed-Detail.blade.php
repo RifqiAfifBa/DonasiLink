@@ -169,6 +169,118 @@ $sakit = $kampanye->sedang_sakit === 'ya';
         @if($kampanye->penarikan->isNotEmpty())
         <x-chart id="fundDistributionChart" title="Distribusi Dana Kampanye" type="pie" :data="$fundDistributionData" />
         @endif
+
+        {{-- PERKEMBANGAN HEWAN --}}
+        <x-card padding="p-7">
+            <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                <div>
+                    <span class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-700 dark:text-teal-300 text-[11px] font-bold uppercase tracking-wider">
+                        <i class="fas fa-stethoscope"></i> Monitoring Hewan
+                    </span>
+                    <h3 class="mt-2 flex items-center gap-2 text-base font-bold text-ink-900 dark:text-white">
+                        <i class="fas fa-heart-pulse text-teal-500"></i> Riwayat Perkembangan {{ $kampanye->nama_hewan }}
+                    </h3>
+                    <p class="text-xs text-ink-500 dark:text-ink-400 mt-0.5">Update terbaru kondisi hewan yang diposting oleh shelter secara transparan.</p>
+                </div>
+                @if($kampanye->perkembangan->isNotEmpty())
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300 text-xs font-bold">
+                    <i class="fas fa-list-check"></i> {{ $kampanye->perkembangan->count() }} Catatan
+                </span>
+                @endif
+            </div>
+
+            @if($kampanye->perkembangan->isEmpty())
+                <div class="flex flex-col items-center text-center py-8 rounded-2xl bg-ink-50 dark:bg-ink-900 border border-dashed border-ink-200 dark:border-ink-700">
+                    <div class="w-12 h-12 rounded-full bg-teal-100 dark:bg-teal-900/40 text-teal-600 dark:text-teal-300 flex items-center justify-center mb-2">
+                        <i class="fas fa-stethoscope"></i>
+                    </div>
+                    <p class="text-sm font-semibold text-ink-900 dark:text-white">Belum ada catatan perkembangan</p>
+                    <p class="text-xs text-ink-500 dark:text-ink-400 mt-1 max-w-sm">Shelter akan segera memposting update kondisi hewan ini. Pantau terus halaman ini.</p>
+                </div>
+            @else
+                <ol class="relative space-y-4 pl-6 before:absolute before:left-2 before:top-1.5 before:bottom-1.5 before:w-px before:bg-gradient-to-b before:from-teal-400 before:via-brand-400 before:to-fuchsia-400 before:opacity-30 before:rounded-full">
+                    @foreach($kampanye->perkembangan as $update)
+                    <li class="relative">
+                        {{-- Timeline dot --}}
+                        <span class="absolute -left-6 top-3 w-4 h-4 rounded-full ring-4 ring-white dark:ring-ink-800
+                            {{ $update->jenis === 'medis' ? 'bg-rose-400' : '' }}
+                            {{ $update->jenis === 'pakan' ? 'bg-amber-400' : '' }}
+                            {{ $update->jenis === 'perawatan' ? 'bg-blue-400' : '' }}
+                            {{ $update->jenis === 'umum' ? 'bg-teal-400' : '' }}
+                        "></span>
+
+                        <div class="rounded-2xl border border-ink-200 dark:border-ink-700 bg-white dark:bg-ink-900 overflow-hidden">
+                            {{-- Header --}}
+                            <div class="flex flex-wrap items-center justify-between gap-3 px-5 py-3 border-b border-ink-100 dark:border-ink-700 bg-ink-50 dark:bg-ink-800/40">
+                                <div>
+                                    <p class="text-xs text-ink-500 dark:text-ink-400">{{ $update->tanggal_update->translatedFormat('d F Y') }}</p>
+                                    <p class="text-sm font-bold text-ink-900 dark:text-white">{{ $update->judul }}</p>
+                                    @if($update->nama_dokter)
+                                        <p class="text-xs text-ink-400 dark:text-ink-500 mt-0.5">
+                                            <i class="fas fa-user-doctor mr-1"></i>Dr. {{ $update->nama_dokter }}
+                                            @if($update->nama_klinik) · {{ $update->nama_klinik }} @endif
+                                        </p>
+                                    @endif
+                                </div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    @if($update->kondisi)
+                                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold {{ $update->kondisiColor() }}">
+                                            <i class="fas fa-circle text-[6px]"></i> {{ $update->kondisiLabel() }}
+                                        </span>
+                                    @endif
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold capitalize
+                                        {{ $update->jenis === 'medis' ? 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-300' : '' }}
+                                        {{ $update->jenis === 'pakan' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' : '' }}
+                                        {{ $update->jenis === 'perawatan' ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : '' }}
+                                        {{ $update->jenis === 'umum' ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300' : '' }}
+                                    ">
+                                        <i class="fas {{ $update->jenisIcon() }} text-[10px]"></i> {{ $update->jenis }}
+                                    </span>
+                                </div>
+                            </div>
+
+                            {{-- Catatan --}}
+                            <div class="px-5 py-4">
+                                <p class="text-sm text-ink-700 dark:text-ink-200 leading-relaxed whitespace-pre-line">{{ $update->catatan }}</p>
+                            </div>
+
+                            {{-- Foto sebelum & sesudah --}}
+                            @if($update->foto_sebelum || $update->foto_sesudah)
+                            <div class="px-5 pb-5">
+                                <p class="text-[11px] font-bold uppercase tracking-wider text-ink-400 dark:text-ink-500 mb-2">Foto Dokumentasi</p>
+                                <div class="grid grid-cols-2 gap-3">
+                                    @if($update->foto_sebelum)
+                                    <div>
+                                        <p class="text-xs font-semibold text-rose-600 dark:text-rose-400 mb-1.5"><i class="fas fa-arrow-left mr-1"></i>Sebelum</p>
+                                        <a href="{{ route('foto.show', $update->foto_sebelum) }}"
+                                           data-lightbox="{{ route('foto.show', $update->foto_sebelum) }}"
+                                           data-lightbox-alt="Sebelum: {{ $update->judul }}"
+                                           class="block rounded-xl overflow-hidden ring-1 ring-ink-200 dark:ring-ink-700 hover:ring-rose-400 transition-all cursor-zoom-in">
+                                            <img src="{{ route('foto.show', $update->foto_sebelum) }}" alt="Sebelum" class="w-full h-36 object-cover">
+                                        </a>
+                                    </div>
+                                    @endif
+                                    @if($update->foto_sesudah)
+                                    <div>
+                                        <p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 mb-1.5"><i class="fas fa-arrow-right mr-1"></i>Sesudah / Terkini</p>
+                                        <a href="{{ route('foto.show', $update->foto_sesudah) }}"
+                                           data-lightbox="{{ route('foto.show', $update->foto_sesudah) }}"
+                                           data-lightbox-alt="Sesudah: {{ $update->judul }}"
+                                           class="block rounded-xl overflow-hidden ring-1 ring-ink-200 dark:ring-ink-700 hover:ring-emerald-400 transition-all cursor-zoom-in">
+                                            <img src="{{ route('foto.show', $update->foto_sesudah) }}" alt="Sesudah" class="w-full h-36 object-cover">
+                                        </a>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                            @endif
+                        </div>
+                    </li>
+                    @endforeach
+                </ol>
+            @endif
+        </x-card>
+
     </div>
 </section>
 @endsection
